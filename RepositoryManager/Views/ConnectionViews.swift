@@ -32,7 +32,7 @@ struct ConnectionSections: View {
             Text("Token de acceso personal")
         } footer: {
             VStack(alignment: .leading, spacing: 8) {
-                Text("Necesita permiso de escritura sobre los secretos: en un token *fine-grained*, «Secrets: Read and write» (y «Dependabot secrets», «Codespaces secrets» o «Environments» si los usas); en uno clásico, el scope `repo`.")
+                Text("Necesita permiso de escritura sobre los secretos: en un token *fine-grained*, «Secrets: Read and write» (y «Dependabot secrets», «Codespaces secrets» o «Environments» si los usas; «Administration» y «Pages» para los ajustes de repositorio); en uno clásico, el scope `repo`.")
                 HStack(spacing: 16) {
                     Link("Crear fine-grained", destination: tokenURL("settings/personal-access-tokens/new"))
                     Link("Crear clásico", destination: tokenURL("settings/tokens/new?scopes=repo&description=Repository%20Manager"))

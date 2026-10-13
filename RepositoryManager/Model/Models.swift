@@ -243,3 +243,59 @@ extension Array where Element == SecretItem {
         return items
     }
 }
+
+// MARK: - Repository settings
+
+/// Who can open pull requests (Settings › General › Features › Pull requests).
+enum PullRequestCreationPolicy: String, CaseIterable, Identifiable {
+    case all
+    case collaboratorsOnly = "collaborators_only"
+
+    var id: String { rawValue }
+
+    var title: String {
+        switch self {
+        case .all: "Todos los usuarios"
+        case .collaboratorsOnly: "Solo colaboradores"
+        }
+    }
+}
+
+/// Build and deployment source of GitHub Pages.
+enum PagesBuildType: String, CaseIterable, Identifiable {
+    case legacy
+    case workflow
+
+    var id: String { rawValue }
+
+    var title: String {
+        switch self {
+        case .legacy: "Desde una rama"
+        case .workflow: "GitHub Actions"
+        }
+    }
+}
+
+/// Repository options the app can edit (as returned by `GET /repos/{owner}/{repo}`).
+struct RepositorySettings: Equatable {
+    /// nil when the server does not report it (e.g. older GitHub Enterprise Server).
+    var pullRequestCreationPolicy: PullRequestCreationPolicy?
+    var allowMergeCommit = true
+    var allowSquashMerge = true
+    var allowRebaseMerge = true
+
+    var hasMergeMethod: Bool { allowMergeCommit || allowSquashMerge || allowRebaseMerge }
+}
+
+/// GitHub Pages configuration (`GET /repos/{owner}/{repo}/pages`).
+struct PagesSettings: Equatable {
+    static let folders = ["/", "/docs"]
+
+    var buildType: PagesBuildType = .legacy
+    /// Branch and folder published by `.legacy` builds.
+    var branch: String = ""
+    var path: String = "/"
+    var htmlURL: URL?
+
+    var trimmedBranch: String { branch.trimmingCharacters(in: .whitespaces) }
+}

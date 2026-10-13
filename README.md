@@ -17,6 +17,7 @@ SwiftUI, iOS 17 o posterior y **ninguna dependencia de terceros** (el proyecto d
   - el tipo de secreto: **Actions**, **Dependabot**, **Codespaces** o un **entorno** de Actions (se crea en cada repositorio si no existe).
 - **Importar `.env`**: pegar líneas `CLAVE=valor` o abrir un archivo desde Archivos; los secretos existentes se actualizan.
 - **Validación** de nombres según las reglas de GitHub (letras, números y `_`, sin empezar por número ni por `GITHUB_`, sin duplicados).
+- **Ajustes de repositorio** (pestaña *Repositorios*): para cada repositorio, quién puede crear pull requests (**todos los usuarios** o **solo colaboradores**), los métodos de merge permitidos (**merge commits**, **squash merging** y **rebase merging**, al menos uno activado) y el origen de **GitHub Pages › Build and deployment**: **desde una rama** (rama y carpeta `/` o `/docs`) o **GitHub Actions**. Si Pages no está activado, se activa con el origen elegido.
 - **Envío** a todos los repositorios seleccionados (varios en paralelo) con progreso por repositorio y por secreto, resumen de creados/actualizados/fallidos y botón para **reintentar solo los repositorios que fallaron**.
 
 ## Seguridad
@@ -29,8 +30,10 @@ SwiftUI, iOS 17 o posterior y **ninguna dependencia de terceros** (el proyecto d
 
 | Tipo de token | Permisos necesarios |
 |---------------|---------------------|
-| Fine-grained  | Acceso a los repositorios de destino, **Secrets: Read and write** (y **Dependabot secrets**, **Codespaces secrets** o **Environments: Read and write** si usas esos tipos). *Metadata: Read* se incluye automáticamente. |
+| Fine-grained  | Acceso a los repositorios de destino, **Secrets: Read and write** (y **Dependabot secrets**, **Codespaces secrets** o **Environments: Read and write** si usas esos tipos). Para los ajustes de repositorio, **Administration: Read and write** y **Pages: Read and write**. *Metadata: Read* se incluye automáticamente. |
 | Clásico       | Scope `repo` (`public_repo` basta solo para repositorios públicos). |
+
+Los ajustes de repositorio requieren además que tu usuario sea **administrador** del repositorio.
 
 ## Instalar en el iPhone (Ad Hoc desde GitHub Pages)
 
@@ -106,6 +109,7 @@ Para ejecutarla en un dispositivo desde Xcode, elige tu equipo en *Signing & Cap
 │   │   ├── SecretEditorViews.swift     # Editor de secreto e importación .env
 │   │   ├── RepositorySelectionView.swift # Selección múltiple de repositorios
 │   │   ├── UploadView.swift            # Progreso y resultados del envío
+│   │   ├── RepositorySettingsView.swift # Pestaña Repositorios: pull requests y GitHub Pages
 │   │   └── ConnectionViews.swift       # Bienvenida y Ajustes
 │   └── Resources/Assets.xcassets       # Icono y color de acento
 ├── tests/SealedBoxTests.swift          # Vectores de prueba del cifrado
