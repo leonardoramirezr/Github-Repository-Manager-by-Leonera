@@ -3,7 +3,7 @@ import Foundation
 import CryptoKit
 #endif
 
-// GitHub requires secret values to be encrypted with a libsodium "sealed box"
+// The secrets API requires values to be encrypted with a libsodium "sealed box"
 // (crypto_box_seal: X25519 + XSalsa20-Poly1305, nonce = BLAKE2b(epk || pk)).
 // CryptoKit only provides the X25519 part, so the rest is implemented here
 // to keep the app free of third-party dependencies.

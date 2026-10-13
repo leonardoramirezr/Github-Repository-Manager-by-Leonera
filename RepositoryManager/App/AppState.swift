@@ -67,9 +67,9 @@ final class AppState {
         }
     }
 
-    var client: GitHubClient? {
+    var client: APIClient? {
         guard isConfigured, let baseURL = settings.apiBaseURL else { return nil }
-        return GitHubClient(baseURL: baseURL, token: token)
+        return APIClient(baseURL: baseURL, token: token)
     }
 
     // MARK: - Connection
@@ -84,9 +84,9 @@ final class AppState {
         newSettings.serverURL = parsed.server ?? serverURL.trimmingCharacters(in: .whitespacesAndNewlines)
         newSettings.account = parsed.account
         guard let baseURL = newSettings.apiBaseURL else {
-            throw GitHubError(statusCode: 0, message: "La URL del servidor no es válida.")
+            throw APIError(statusCode: 0, message: "La URL del servidor no es válida.")
         }
-        let user = try await GitHubClient(baseURL: baseURL, token: trimmedToken).currentUser()
+        let user = try await APIClient(baseURL: baseURL, token: trimmedToken).currentUser()
         newSettings.login = user.login
 
         try KeychainStore.write(Data(trimmedToken.utf8), account: KeychainStore.Account.token)
@@ -232,7 +232,7 @@ final class AppState {
         await upload(setID: setID, only: failed)
     }
 
-    private func send(_ set: SecretSet, to repository: String, client: GitHubClient) async {
+    private func send(_ set: SecretSet, to repository: String, client: APIClient) async {
         let environment = set.trimmedEnvironment
         let key: RepositoryPublicKey
         do {

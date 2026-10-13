@@ -14,10 +14,12 @@ SwiftUI, iOS 17 o posterior y **ninguna dependencia de terceros** (el proyecto d
 - **Conjuntos de secretos**: crear, renombrar, duplicar (deslizar o mantener pulsado) y eliminar. Cada conjunto tiene:
   - los secretos (nombre + valor, ocultos por defecto, con valores multilínea y botón de pegar),
   - **uno o más repositorios de destino**: lista con búsqueda y selección múltiple de los repositorios que ve el token, «seleccionar todos» y opción de escribir `propietario/repositorio` a mano,
-  - el tipo de secreto: **Actions**, **Dependabot**, **Codespaces** o un **entorno** de Actions (se crea en cada repositorio si no existe).
+  - el tipo de secreto: **Flujos de trabajo (CI)** (Actions), **Actualización de dependencias** (Dependabot), **Entornos de desarrollo** (Codespaces) o **Entorno de despliegue** (entorno de Actions, que se crea en cada repositorio si no existe).
 - **Importar `.env`**: pegar líneas `CLAVE=valor` o abrir un archivo desde Archivos; los secretos existentes se actualizan.
 - **Validación** de nombres según las reglas de GitHub (letras, números y `_`, sin empezar por número ni por `GITHUB_`, sin duplicados).
 - **Envío** a todos los repositorios seleccionados (varios en paralelo) con progreso por repositorio y por secreto, resumen de creados/actualizados/fallidos y botón para **reintentar solo los repositorios que fallaron**.
+
+La app no muestra el nombre ni la marca GitHub en su interfaz para no chocar con la guía 5.2 (propiedad intelectual) de la App Store; las únicas referencias que quedan en el código son las técnicas necesarias para conectarse (host `github.com`/`api.github.com`, cabeceras de la API y la regla que prohíbe el prefijo `GITHUB_` en los nombres de secretos).
 
 ## Seguridad
 
@@ -97,7 +99,7 @@ Para ejecutarla en un dispositivo desde Xcode, elige tu equipo en *Signing & Cap
 │   │   └── AppState.swift              # Estado: conexión, conjuntos, envío a varios repositorios
 │   ├── Model/Models.swift              # SecretSet, SecretItem, ajustes, .env, validación
 │   ├── Services/
-│   │   ├── GitHubClient.swift          # Cliente de la API REST de GitHub
+│   │   ├── APIClient.swift             # Cliente de la API REST
 │   │   ├── SealedBox.swift             # Sealed box compatible con libsodium
 │   │   └── KeychainStore.swift         # Persistencia en el Llavero
 │   ├── Views/

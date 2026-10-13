@@ -7,7 +7,7 @@ enum KeychainStore {
     static let service = Bundle.main.bundleIdentifier ?? "com.leonardoramirezr.repositorymanager"
 
     enum Account {
-        static let token = "github-token"
+        static let token = "access-token"
         static let secretSets = "secret-sets"
     }
 

@@ -11,10 +11,10 @@ enum SecretTarget: String, Codable, CaseIterable, Identifiable {
 
     var title: String {
         switch self {
-        case .actions: "Actions"
-        case .dependabot: "Dependabot"
-        case .codespaces: "Codespaces"
-        case .environment: "Entorno (Actions)"
+        case .actions: "Flujos de trabajo (CI)"
+        case .dependabot: "Actualización de dependencias"
+        case .codespaces: "Entornos de desarrollo"
+        case .environment: "Entorno de despliegue"
         }
     }
 
@@ -33,7 +33,7 @@ struct SecretItem: Codable, Identifiable, Equatable, Hashable {
     var name: String = ""
     var value: String = ""
 
-    /// Name as GitHub stores it (secret names are case-insensitive and upper-cased).
+    /// Name as the server stores it (secret names are case-insensitive and upper-cased).
     var normalizedName: String {
         name.trimmingCharacters(in: .whitespaces).uppercased()
     }
@@ -128,7 +128,7 @@ struct Repository: Codable, Identifiable, Hashable {
 
 /// Connection settings entered on first launch.
 struct AppSettings: Codable, Equatable {
-    /// Web URL of the GitHub server, e.g. https://github.com or https://github.example.com
+    /// Web URL of the server (the default host, or a self-hosted one such as https://git.example.com).
     var serverURL: String = "https://github.com"
     /// Optional user or organization used to filter the repository list.
     var account: String = ""
@@ -159,7 +159,7 @@ struct AppSettings: Codable, Equatable {
         return URL(string: "\(scheme)://\(host)\(port)/api/v3")
     }
 
-    /// Accepts either a bare name ("my-org") or a profile URL ("https://github.com/my-org")
+    /// Accepts either a bare name ("my-org") or a profile URL ("https://host/my-org")
     /// and returns the account name and, if present, the server URL.
     static func parseAccount(_ input: String) -> (account: String, server: String?) {
         let text = input.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -169,7 +169,7 @@ struct AppSettings: Codable, Equatable {
             return (text, nil)
         }
         let parts = components.path.split(separator: "/").map(String.init)
-        // https://github.com/orgs/my-org/... → my-org
+        // https://host/orgs/my-org/... → my-org
         let account = (parts.first == "orgs" && parts.count > 1) ? parts[1] : (parts.first ?? "")
         let scheme = components.scheme ?? "https"
         let port = components.port.map { ":\($0)" } ?? ""

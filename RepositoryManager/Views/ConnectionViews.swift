@@ -23,7 +23,7 @@ struct ConnectionSections: View {
             SecureField(
                 "Token",
                 text: $token,
-                prompt: Text(state.isConfigured ? "Deja vacío para mantener el actual" : "github_pat_… o ghp_…")
+                prompt: Text(state.isConfigured ? "Deja vacío para mantener el actual" : "Pega aquí tu token")
             )
             .focused($focused, equals: .token)
             .submitLabel(.next)
@@ -32,7 +32,7 @@ struct ConnectionSections: View {
             Text("Token de acceso personal")
         } footer: {
             VStack(alignment: .leading, spacing: 8) {
-                Text("Necesita permiso de escritura sobre los secretos: en un token *fine-grained*, «Secrets: Read and write» (y «Dependabot secrets», «Codespaces secrets» o «Environments» si los usas); en uno clásico, el scope `repo`.")
+                Text("Necesita permiso de escritura sobre los secretos de los repositorios (y sobre los entornos si usas secretos de entorno). En un token clásico basta con el scope `repo`.")
                 HStack(spacing: 16) {
                     Link("Crear fine-grained", destination: tokenURL("settings/personal-access-tokens/new"))
                     Link("Crear clásico", destination: tokenURL("settings/tokens/new?scopes=repo&description=Repository%20Manager"))
@@ -60,7 +60,7 @@ struct ConnectionSections: View {
         } header: {
             Text("Conexión")
         } footer: {
-            Text("La cuenta u organización (nombre o URL, p. ej. `https://github.com/mi-org`) es opcional y solo filtra la lista de repositorios. Para GitHub Enterprise Server indica la URL de tu servidor.")
+            Text("La cuenta u organización (nombre o URL de su perfil) es opcional y solo filtra la lista de repositorios. Si usas un servidor propio, indica su URL.")
         }
         .textInputAutocapitalization(.never)
         .autocorrectionDisabled()
@@ -136,7 +136,7 @@ struct OnboardingView: View {
                             .symbolRenderingMode(.hierarchical)
                         Text("Repository Manager")
                             .font(.title.bold())
-                        Text("Guarda conjuntos de secretos y súbelos a uno o varios repositorios de GitHub de una vez.")
+                        Text("Guarda conjuntos de secretos y súbelos a uno o varios repositorios de una vez.")
                             .font(.subheadline)
                             .multilineTextAlignment(.center)
                             .foregroundStyle(.secondary)
@@ -150,7 +150,7 @@ struct OnboardingView: View {
 
                 Section {
                 } footer: {
-                    Label("El token se guarda en el Llavero del iPhone y solo se envía a GitHub.", systemImage: "lock.fill")
+                    Label("El token se guarda en el Llavero del iPhone y solo se envía al servidor configurado.", systemImage: "lock.fill")
                         .frame(maxWidth: .infinity)
                 }
             }
