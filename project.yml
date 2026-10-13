@@ -1,14 +1,14 @@
 # XcodeGen spec: `xcodegen generate` creates RepositoryManager.xcodeproj (not committed).
 name: RepositoryManager
 options:
-  bundleIdPrefix: com.leonardoramirezr
   deploymentTarget:
     iOS: "17.0"
   createIntermediateGroups: true
 settings:
   base:
+    # Fixed bundle ID: never overridden.
+    APP_BUNDLE_ID: com.leonardoramirezr.repo-manager-by-leonera
     # Overridden by CI (build settings passed to xcodebuild).
-    APP_BUNDLE_ID: com.leonardoramirezr.repository-manager-by-leonera
     MARKETING_VERSION: "0.0.0"
     CURRENT_PROJECT_VERSION: "1"
     DEVELOPMENT_TEAM: ""
