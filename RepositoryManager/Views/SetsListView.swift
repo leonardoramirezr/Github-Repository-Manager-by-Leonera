@@ -103,7 +103,7 @@ struct SetsListView: View {
         ) { set in
             Button("Eliminar conjunto", role: .destructive) { state.deleteSet(set.id) }
         } message: { _ in
-            Text("Se borrará el conjunto y sus valores guardados en este iPhone. Los secretos ya enviados a los repositorios no se modifican.")
+            Text("Se borrará el conjunto y sus valores guardados en este iPhone. Los secretos ya enviados a GitHub no se modifican.")
         }
     }
 

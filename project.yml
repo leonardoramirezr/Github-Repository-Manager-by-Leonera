@@ -8,7 +8,7 @@ options:
 settings:
   base:
     # Overridden by CI (build settings passed to xcodebuild).
-    APP_BUNDLE_ID: com.leonardoramirezr.repositorymanager
+    APP_BUNDLE_ID: com.leonardoramirezr.ios-github-repository-manager-by-leonera
     MARKETING_VERSION: "0.0.0"
     CURRENT_PROJECT_VERSION: "1"
     DEVELOPMENT_TEAM: ""

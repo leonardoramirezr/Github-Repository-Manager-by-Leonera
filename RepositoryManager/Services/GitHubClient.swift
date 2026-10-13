@@ -3,7 +3,7 @@ import Foundation
 import FoundationNetworking
 #endif
 
-struct APIError: LocalizedError {
+struct GitHubError: LocalizedError {
     let statusCode: Int
     let message: String
 
@@ -12,12 +12,12 @@ struct APIError: LocalizedError {
         case 401: "Token inválido o caducado (401)."
         case 403: "Permiso denegado (403): \(message). Revisa que el token tenga permiso de escritura sobre secretos."
         case 404: "No encontrado (404). Comprueba el repositorio y que el token tenga acceso a él."
-        default: "El servidor respondió \(statusCode): \(message)"
+        default: "GitHub respondió \(statusCode): \(message)"
         }
     }
 }
 
-struct APIUser: Decodable {
+struct GitHubUser: Decodable {
     let login: String
     let name: String?
 }
@@ -33,7 +33,7 @@ struct RepositoryPublicKey: Decodable {
 }
 
 /// Small REST client for the endpoints the app needs.
-struct APIClient {
+struct GitHubClient {
     let baseURL: URL
     let token: String
     var session: URLSession = .shared
@@ -80,11 +80,11 @@ struct APIClient {
         }
         let (data, response) = try await session.data(for: request)
         guard let http = response as? HTTPURLResponse else {
-            throw APIError(statusCode: 0, message: "Respuesta inesperada")
+            throw GitHubError(statusCode: 0, message: "Respuesta inesperada")
         }
         guard (200..<300).contains(http.statusCode) else {
             let message = (try? JSONSerialization.jsonObject(with: data) as? [String: Any])?["message"] as? String
-            throw APIError(statusCode: http.statusCode, message: message ?? HTTPURLResponse.localizedString(forStatusCode: http.statusCode))
+            throw GitHubError(statusCode: http.statusCode, message: message ?? HTTPURLResponse.localizedString(forStatusCode: http.statusCode))
         }
         return (data, http)
     }
@@ -96,8 +96,8 @@ struct APIClient {
 
     // MARK: - Endpoints
 
-    func currentUser() async throws -> APIUser {
-        try await get(url(["user"]), as: APIUser.self)
+    func currentUser() async throws -> GitHubUser {
+        try await get(url(["user"]), as: GitHubUser.self)
     }
 
     /// Every repository the token can see, optionally limited to one owner.
@@ -136,7 +136,7 @@ struct APIClient {
         let envURL = url(repoSegments(repository) + ["environments", name])
         do {
             _ = try await request("GET", envURL)
-        } catch let error as APIError where error.statusCode == 404 {
+        } catch let error as GitHubError where error.statusCode == 404 {
             _ = try await request("PUT", envURL, body: [:])
         }
     }
