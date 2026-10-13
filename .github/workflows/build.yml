@@ -43,8 +43,6 @@ jobs:
 
       - name: Etiqueta, versión, identificadores y modo de firma
         id: meta
-        env:
-          APP_BUNDLE_ID_VAR: ${{ vars.APP_BUNDLE_ID }}
         run: |
           set -euo pipefail
 
@@ -79,13 +77,8 @@ jobs:
             stable=false
           fi
 
-          # Bundle ID: repository variable APP_BUNDLE_ID, or com.<owner>.<repo> in lowercase.
-          if [ -n "${APP_BUNDLE_ID_VAR:-}" ]; then
-            bundle_id="$APP_BUNDLE_ID_VAR"
-          else
-            bundle_id="$(printf 'com.%s.%s' "$GITHUB_REPOSITORY_OWNER" "${GITHUB_REPOSITORY#*/}" \
-              | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9.-]/-/g')"
-          fi
+          # Bundle ID: fixed, the same as APP_BUNDLE_ID in project.yml.
+          bundle_id="com.leonardoramirezr.repo-manager-by-leonera"
 
           {
             echo "signed=$signed"
@@ -128,7 +121,6 @@ jobs:
 
       - name: Archive
         env:
-          BUNDLE_ID: ${{ steps.meta.outputs.bundle_id }}
           VERSION: ${{ steps.meta.outputs.version }}
           BUILD_NUMBER: ${{ steps.meta.outputs.build_number }}
           SIGNED: ${{ steps.meta.outputs.signed }}
@@ -139,7 +131,6 @@ jobs:
             -project "$PROJECT" -scheme "$SCHEME" -configuration Release
             -destination 'generic/platform=iOS'
             -archivePath build/RepositoryManager.xcarchive
-            APP_BUNDLE_ID="$BUNDLE_ID"
             MARKETING_VERSION="$VERSION"
             CURRENT_PROJECT_VERSION="$BUILD_NUMBER"
           )

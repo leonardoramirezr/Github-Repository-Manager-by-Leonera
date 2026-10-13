@@ -50,7 +50,7 @@ En **Settings › Secrets and variables › Actions** del repositorio (secrets d
 - **Sin ninguno de los cuatro**, el workflow genera un IPA **sin firmar** (artefacto y release, pero no instalable ni publicado en Pages).
 - **Con solo algunos**, el workflow falla con un error que indica cuáles faltan.
 
-Opcional: la variable de repositorio `APP_BUNDLE_ID` sustituye al bundle ID por defecto, `com.<owner>.<repo>` en minúsculas (`com.leonardoramirezr.ios-github-repository-manager-by-leonera`).
+El bundle ID es siempre `com.leonardoramirezr.repo-manager-by-leonera` y no se puede sustituir.
 
 ### 2. Activar GitHub Pages
 
@@ -67,7 +67,7 @@ Basta con **registrar su UDID** en [Certificates, Identifiers & Profiles › Dev
 ### Qué hace el workflow
 
 1. **Etiqueta y release**: en `main`, la etiqueta es `0.x.0` (el número intermedio sube respecto al último tag) y se publica como release estable *Latest*; en otras ramas, `build-<run_number>-<sha7>` como pre-release. Ningún build se cancela (`concurrency` por `main` o por `run_id`).
-2. **Identificadores**: el bundle ID se pasa a `xcodebuild` como build setting (`APP_BUNDLE_ID`) y el proyecto lo usa en `PRODUCT_BUNDLE_IDENTIFIER` (`project.yml`). La app no usa App Groups ni capacidades que Xcode no pueda registrar solo con la clave de API.
+2. **Identificadores**: el bundle ID es fijo, `com.leonardoramirezr.repo-manager-by-leonera`, definido en `APP_BUNDLE_ID` y usado en `PRODUCT_BUNDLE_IDENTIFIER` (`project.yml`); el workflow no lo sustituye. La app no usa App Groups ni capacidades que Xcode no pueda registrar solo con la clave de API.
 3. **Validación previa** con la API de App Store Connect (`scripts/asc.py`, solo biblioteca estándar de Python + `openssl` para el JWT ES256): comprueba que la clave funciona y que hay al menos un dispositivo iOS registrado.
 4. **Archive** con firma automática (`-allowProvisioningUpdates` y la clave de API): Xcode registra el App ID y crea los perfiles.
 5. **Exportación Ad Hoc** (`method=release-testing`, `signingStyle=automatic`) con el certificado de distribución gestionado en la nube; después verifica que cada bundle lleva un `embedded.mobileprovision` Ad Hoc y muestra cuántos dispositivos incluye.
