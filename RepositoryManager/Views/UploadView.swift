@@ -34,7 +34,7 @@ struct UploadView: View {
                     }
                 }
             }
-            .navigationTitle(state.isUploading ? "Enviando…" : "Envío terminado")
+            .navigationTitle(state.isUploading ? "Aplicando…" : "Terminado")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) {

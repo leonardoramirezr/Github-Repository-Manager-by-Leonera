@@ -144,7 +144,7 @@ struct ImportEnvView: View {
                 } header: {
                     Text("Contenido")
                 } footer: {
-                    Text("Formato CLAVE=valor, una por línea. Los secretos que ya existan en el conjunto actualizarán su valor.")
+                    Text("Formato CLAVE=valor, una por línea. Los secretos que ya existan en el preset actualizarán su valor.")
                 }
 
                 Section {

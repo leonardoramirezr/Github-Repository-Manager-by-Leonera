@@ -136,7 +136,7 @@ struct OnboardingView: View {
                             .symbolRenderingMode(.hierarchical)
                         Text("Repository Manager")
                             .font(.title.bold())
-                        Text("Guarda conjuntos de secretos y súbelos a uno o varios repositorios de GitHub de una vez.")
+                        Text("Guarda presets de secretos y ajustes, y aplícalos a uno o varios repositorios de GitHub de una vez.")
                             .font(.subheadline)
                             .multilineTextAlignment(.center)
                             .foregroundStyle(.secondary)
@@ -214,7 +214,7 @@ struct SettingsView: View {
                     dismiss()
                 }
             } message: {
-                Text("Se borrará el token del Llavero. Tus conjuntos de secretos se conservan.")
+                Text("Se borrará el token del Llavero. Tus presets se conservan.")
             }
         }
     }

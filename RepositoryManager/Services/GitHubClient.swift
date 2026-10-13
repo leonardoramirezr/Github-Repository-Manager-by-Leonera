@@ -233,6 +233,29 @@ struct GitHubClient {
         _ = try await request("PATCH", url(repoSegments(repository)), body: body)
     }
 
+    /// Sets every option of `settings` (used by presets, which apply the same values to many repositories).
+    func applyRepositorySettings(_ repository: String, _ settings: RepositorySettings) async throws {
+        var body: [String: Any] = [
+            "allow_merge_commit": settings.allowMergeCommit,
+            "allow_squash_merge": settings.allowSquashMerge,
+            "allow_rebase_merge": settings.allowRebaseMerge,
+        ]
+        if let policy = settings.pullRequestCreationPolicy {
+            body["pull_request_creation_policy"] = policy.rawValue
+        }
+        _ = try await request("PATCH", url(repoSegments(repository)), body: body)
+    }
+
+    /// Sets the Pages build source, enabling Pages when needed. An empty branch means the default branch.
+    func applyPages(_ repository: String, _ pages: PagesSettings) async throws {
+        var resolved = pages
+        if resolved.buildType == .legacy && resolved.trimmedBranch.isEmpty {
+            resolved.branch = try await repositoryDetails(repository).defaultBranch
+        }
+        let current = try await self.pages(repository)
+        try await savePages(repository, resolved, create: current == nil)
+    }
+
     /// GitHub Pages configuration, or nil when Pages is not enabled.
     func pages(_ repository: String) async throws -> PagesSettings? {
         let site: PagesSite

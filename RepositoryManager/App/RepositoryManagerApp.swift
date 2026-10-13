@@ -26,7 +26,7 @@ struct RootView: View {
             if state.isConfigured {
                 TabView {
                     SetsListView()
-                        .tabItem { Label("Secretos", systemImage: "key.horizontal") }
+                        .tabItem { Label("Presets", systemImage: "slider.horizontal.3") }
                     RepositoriesView()
                         .tabItem { Label("Repositorios", systemImage: "book.closed") }
                 }

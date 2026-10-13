@@ -54,7 +54,8 @@ struct SecretItem: Codable, Identifiable, Equatable, Hashable {
     }
 }
 
-/// A named, reusable group of secrets plus the repositories they are sent to.
+/// A preset: a named, reusable group of secrets and repository settings plus the repositories
+/// they are applied to.
 struct SecretSet: Codable, Identifiable, Equatable, Hashable {
     var id = UUID()
     var name: String
@@ -63,6 +64,11 @@ struct SecretSet: Codable, Identifiable, Equatable, Hashable {
     var repositories: [String] = []
     var target: SecretTarget = .actions
     var environment: String = ""
+    /// Pull request settings applied to every repository; nil leaves them unchanged.
+    /// Optional (like `pages`) so presets saved before these options existed still decode.
+    var repositorySettings: RepositorySettings?
+    /// GitHub Pages build source applied to every repository; nil leaves it unchanged.
+    var pages: PagesSettings?
     var lastSentAt: Date?
 
     var displayName: String { name.isEmpty ? "Sin nombre" : name }
@@ -71,6 +77,19 @@ struct SecretSet: Codable, Identifiable, Equatable, Hashable {
 
     var destinationDescription: String {
         target == .environment ? "entorno «\(trimmedEnvironment)»" : target.title
+    }
+
+    var hasRepositoryChanges: Bool { repositorySettings != nil || pages != nil }
+
+    /// What applying the preset changes, e.g. "3 secretos (Actions) · pull requests · GitHub Pages".
+    var actionsDescription: String {
+        var parts: [String] = []
+        if !secrets.isEmpty {
+            parts.append("\(secrets.count == 1 ? "1 secreto" : "\(secrets.count) secretos") (\(destinationDescription))")
+        }
+        if repositorySettings != nil { parts.append("ajustes de pull requests") }
+        if let pages { parts.append("GitHub Pages: \(pages.buildType.title)") }
+        return parts.joined(separator: " · ")
     }
 
     var repositoriesSummary: String {
@@ -84,9 +103,14 @@ struct SecretSet: Codable, Identifiable, Equatable, Hashable {
     var problems: [String] {
         var result: [String] = []
         if repositories.isEmpty { result.append("Selecciona al menos un repositorio.") }
-        if secrets.isEmpty { result.append("Añade al menos un secreto.") }
-        if target == .environment && trimmedEnvironment.isEmpty {
+        if secrets.isEmpty && !hasRepositoryChanges {
+            result.append("Añade al menos un secreto o un ajuste de repositorio.")
+        }
+        if !secrets.isEmpty && target == .environment && trimmedEnvironment.isEmpty {
             result.append("Indica el nombre del entorno.")
+        }
+        if let repositorySettings, !repositorySettings.hasMergeMethod {
+            result.append("Activa al menos un método de merge.")
         }
         for secret in secrets {
             if let problem = secret.nameProblem {
@@ -214,6 +238,11 @@ struct RepositoryUpload: Identifiable {
     var id: String { repository }
 
     var isFinished: Bool { error != nil || results.allSatisfy(\.isFinished) }
+
+    mutating func setStatus(_ status: UploadResult.Status, for id: UUID) {
+        guard let index = results.firstIndex(where: { $0.id == id }) else { return }
+        results[index].status = status
+    }
     var failedCount: Int { error != nil ? results.count : results.filter(\.isFailure).count }
     var succeeded: Bool { isFinished && failedCount == 0 }
 }
@@ -247,7 +276,7 @@ extension Array where Element == SecretItem {
 // MARK: - Repository settings
 
 /// Who can open pull requests (Settings › General › Features › Pull requests).
-enum PullRequestCreationPolicy: String, CaseIterable, Identifiable {
+enum PullRequestCreationPolicy: String, Codable, CaseIterable, Identifiable {
     case all
     case collaboratorsOnly = "collaborators_only"
 
@@ -262,7 +291,7 @@ enum PullRequestCreationPolicy: String, CaseIterable, Identifiable {
 }
 
 /// Build and deployment source of GitHub Pages.
-enum PagesBuildType: String, CaseIterable, Identifiable {
+enum PagesBuildType: String, Codable, CaseIterable, Identifiable {
     case legacy
     case workflow
 
@@ -277,7 +306,7 @@ enum PagesBuildType: String, CaseIterable, Identifiable {
 }
 
 /// Repository options the app can edit (as returned by `GET /repos/{owner}/{repo}`).
-struct RepositorySettings: Equatable {
+struct RepositorySettings: Codable, Equatable, Hashable {
     /// nil when the server does not report it (e.g. older GitHub Enterprise Server).
     var pullRequestCreationPolicy: PullRequestCreationPolicy?
     var allowMergeCommit = true
@@ -288,11 +317,11 @@ struct RepositorySettings: Equatable {
 }
 
 /// GitHub Pages configuration (`GET /repos/{owner}/{repo}/pages`).
-struct PagesSettings: Equatable {
+struct PagesSettings: Codable, Equatable, Hashable {
     static let folders = ["/", "/docs"]
 
     var buildType: PagesBuildType = .legacy
-    /// Branch and folder published by `.legacy` builds.
+    /// Branch and folder published by `.legacy` builds. In a preset, empty means the default branch.
     var branch: String = ""
     var path: String = "/"
     var htmlURL: URL?
