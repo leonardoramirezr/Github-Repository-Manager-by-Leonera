@@ -4,7 +4,7 @@ import Security
 /// Minimal wrapper around the iOS Keychain (generic passwords).
 /// The token and the secret sets (which contain secret values) live here.
 enum KeychainStore {
-    static let service = Bundle.main.bundleIdentifier ?? "com.leonardoramirezr.repositorymanager"
+    static let service = Bundle.main.bundleIdentifier ?? "com.leonardoramirezr.repo-manager-by-leonera"
 
     enum Account {
         static let token = "github-token"
