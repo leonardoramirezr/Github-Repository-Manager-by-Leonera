@@ -13,7 +13,7 @@ struct SecretSetDetailView: View {
     var body: some View {
         Form {
             Section {
-                TextField("Nombre del conjunto", text: $secretSet.name, prompt: Text("Ej. Producción API"))
+                TextField("Nombre del preset", text: $secretSet.name, prompt: Text("Ej. Producción API"))
                     .font(.headline)
             } header: {
                 Text("Nombre")
@@ -21,6 +21,8 @@ struct SecretSetDetailView: View {
 
             destinationSection
             secretsSection
+            pullRequestsSection
+            pagesSection
         }
         .navigationTitle(secretSet.displayName)
         .navigationBarTitleDisplayMode(.inline)
@@ -41,7 +43,7 @@ struct SecretSetDetailView: View {
                     Button {
                         state.duplicateSet(secretSet.id)
                     } label: {
-                        Label("Duplicar conjunto", systemImage: "plus.square.on.square")
+                        Label("Duplicar preset", systemImage: "plus.square.on.square")
                     }
                 } label: {
                     Label("Más", systemImage: "ellipsis.circle")
@@ -52,13 +54,13 @@ struct SecretSetDetailView: View {
             sendBar
         }
         .confirmationDialog(confirmTitle, isPresented: $confirmSend, titleVisibility: .visible) {
-            Button("Enviar") {
+            Button("Aplicar") {
                 let id = secretSet.id
                 Task { await state.upload(setID: id) }
             }
             Button("Cancelar", role: .cancel) {}
         } message: {
-            Text("Destino: \(secretSet.destinationDescription). Los secretos que ya existan con el mismo nombre se sobrescribirán.")
+            Text(confirmMessage)
         }
         .sheet(isPresented: $showImport) {
             ImportEnvView { items in merge(items) }
@@ -76,7 +78,7 @@ struct SecretSetDetailView: View {
                 }
             }
         }
-        .alert("Revisa el conjunto", isPresented: $showProblems) {
+        .alert("Revisa el preset", isPresented: $showProblems) {
             Button("Aceptar") {}
         } message: {
             Text(secretSet.problems.map { "• \($0)" }.joined(separator: "\n"))
@@ -165,6 +167,83 @@ struct SecretSetDetailView: View {
         }
     }
 
+    private var pullRequestsSection: some View {
+        Section {
+            Toggle(isOn: appliesRepositorySettings.animation()) {
+                Label("Aplicar ajustes de pull requests", systemImage: "arrow.triangle.pull")
+            }
+            if secretSet.repositorySettings != nil {
+                Picker(selection: repositorySetting(\.pullRequestCreationPolicy, default: .all)) {
+                    ForEach(PullRequestCreationPolicy.allCases) { policy in
+                        Text(policy.title).tag(Optional(policy))
+                    }
+                } label: {
+                    Label("Pueden crear pull requests", systemImage: "person.2")
+                }
+                Toggle(isOn: repositorySetting(\.allowMergeCommit, default: true)) {
+                    Label("Permitir merge commits", systemImage: "arrow.triangle.merge")
+                }
+                Toggle(isOn: repositorySetting(\.allowSquashMerge, default: true)) {
+                    Label("Permitir squash merging", systemImage: "square.stack.3d.down.right")
+                }
+                Toggle(isOn: repositorySetting(\.allowRebaseMerge, default: true)) {
+                    Label("Permitir rebase merging", systemImage: "arrow.triangle.branch")
+                }
+            }
+        } header: {
+            Text("Pull requests")
+        } footer: {
+            if let settings = secretSet.repositorySettings, !settings.hasMergeMethod {
+                Text("Debe quedar al menos un método de merge activado.").foregroundStyle(.red)
+            } else if secretSet.repositorySettings != nil {
+                Text("Se aplican a todos los repositorios del preset. «Solo colaboradores» limita la creación de pull requests a quien tiene permiso de escritura. Requiere ser administrador del repositorio.")
+            } else {
+                Text("Desactivado: no se cambian los ajustes de pull requests de los repositorios.")
+            }
+        }
+    }
+
+    private var pagesSection: some View {
+        Section {
+            Picker(selection: pagesBuildType) {
+                Text("No cambiar").tag(PagesBuildType?.none)
+                ForEach(PagesBuildType.allCases) { type in
+                    Text(type.title).tag(Optional(type))
+                }
+            } label: {
+                Label("Origen", systemImage: "globe")
+            }
+            if secretSet.pages?.buildType == .legacy {
+                LabeledContent {
+                    TextField("Rama", text: pagesBranch, prompt: Text("Rama por defecto"))
+                        .multilineTextAlignment(.trailing)
+                        .textInputAutocapitalization(.never)
+                        .autocorrectionDisabled()
+                } label: {
+                    Label("Rama", systemImage: "arrow.triangle.branch")
+                }
+                Picker(selection: pagesPath) {
+                    ForEach(PagesSettings.folders, id: \.self) { folder in
+                        Text(folder == "/" ? "/ (root)" : folder).tag(folder)
+                    }
+                } label: {
+                    Label("Carpeta", systemImage: "folder")
+                }
+            }
+        } header: {
+            Text("GitHub Pages · Build and deployment")
+        } footer: {
+            switch secretSet.pages?.buildType {
+            case .legacy:
+                Text("Los repositorios publicarán Pages desde la rama y carpeta indicadas (vacío = rama por defecto de cada uno). Si Pages no está activado, se activa.")
+            case .workflow:
+                Text("Los repositorios publicarán Pages con un workflow de GitHub Actions. Si Pages no está activado, se activa.")
+            case nil:
+                Text("No se cambia la configuración de GitHub Pages de los repositorios.")
+            }
+        }
+    }
+
     private var sendBar: some View {
         let problems = secretSet.problems
         let count = secretSet.repositories.count
@@ -187,7 +266,7 @@ struct SecretSetDetailView: View {
                 confirmSend = true
             } label: {
                 Label(
-                    count > 1 ? "Enviar a \(count) repositorios" : "Enviar secretos",
+                    count > 1 ? "Aplicar a \(count) repositorios" : "Aplicar preset",
                     systemImage: "paperplane.fill"
                 )
                 .font(.headline)
@@ -206,11 +285,56 @@ struct SecretSetDetailView: View {
     // MARK: - Helpers
 
     private var confirmTitle: String {
-        let secrets = secretSet.secrets.count
         let repos = secretSet.repositories.count
-        let secretsText = secrets == 1 ? "1 secreto" : "\(secrets) secretos"
         let reposText = repos == 1 ? secretSet.repositories.first ?? "" : "\(repos) repositorios"
-        return "¿Enviar \(secretsText) a \(reposText)?"
+        return "¿Aplicar «\(secretSet.displayName)» a \(reposText)?"
+    }
+
+    private var confirmMessage: String {
+        var text = "Se aplicará: \(secretSet.actionsDescription)."
+        if !secretSet.secrets.isEmpty {
+            text += " Los secretos que ya existan con el mismo nombre se sobrescribirán."
+        }
+        return text
+    }
+
+    // MARK: - Repository settings bindings
+
+    private var appliesRepositorySettings: Binding<Bool> {
+        Binding(
+            get: { secretSet.repositorySettings != nil },
+            set: { secretSet.repositorySettings = $0 ? RepositorySettings(pullRequestCreationPolicy: .all) : nil }
+        )
+    }
+
+    private func repositorySetting<Value>(_ keyPath: WritableKeyPath<RepositorySettings, Value>, default value: Value) -> Binding<Value> {
+        Binding(
+            get: { secretSet.repositorySettings?[keyPath: keyPath] ?? value },
+            set: { secretSet.repositorySettings?[keyPath: keyPath] = $0 }
+        )
+    }
+
+    private var pagesBuildType: Binding<PagesBuildType?> {
+        Binding(
+            get: { secretSet.pages?.buildType },
+            set: { newValue in
+                guard let newValue else {
+                    secretSet.pages = nil
+                    return
+                }
+                var pages = secretSet.pages ?? PagesSettings()
+                pages.buildType = newValue
+                secretSet.pages = pages
+            }
+        )
+    }
+
+    private var pagesBranch: Binding<String> {
+        Binding(get: { secretSet.pages?.branch ?? "" }, set: { secretSet.pages?.branch = $0 })
+    }
+
+    private var pagesPath: Binding<String> {
+        Binding(get: { secretSet.pages?.path ?? "/" }, set: { secretSet.pages?.path = $0 })
     }
 
     private func isPrivate(_ repository: String) -> Bool {

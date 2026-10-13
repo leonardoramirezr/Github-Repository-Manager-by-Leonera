@@ -47,16 +47,16 @@ struct SetsListView: View {
             .overlay {
                 if state.secretSets.isEmpty {
                     ContentUnavailableView {
-                        Label("Sin conjuntos de secretos", systemImage: "key.horizontal")
+                        Label("Sin presets", systemImage: "slider.horizontal.3")
                     } description: {
-                        Text("Un conjunto agrupa varios secretos y los repositorios a los que se envían.")
+                        Text("Un preset agrupa secretos y ajustes de repositorio (pull requests y GitHub Pages) y los repositorios a los que se aplican.")
                     } actions: {
-                        Button("Crear conjunto") { state.addSet() }
+                        Button("Crear preset") { state.addSet() }
                             .buttonStyle(.borderedProminent)
                     }
                 }
             }
-            .navigationTitle("Secretos")
+            .navigationTitle("Presets")
             .navigationDestination(for: Route.self) { route in
                 if state.secretSets.contains(where: { $0.id == route.setID }) {
                     switch route {
@@ -79,7 +79,7 @@ struct SetsListView: View {
                     Button {
                         state.addSet()
                     } label: {
-                        Label("Nuevo conjunto", systemImage: "plus")
+                        Label("Nuevo preset", systemImage: "plus")
                     }
                 }
             }
@@ -101,9 +101,9 @@ struct SetsListView: View {
             titleVisibility: .visible,
             presenting: pendingDeletion
         ) { set in
-            Button("Eliminar conjunto", role: .destructive) { state.deleteSet(set.id) }
+            Button("Eliminar preset", role: .destructive) { state.deleteSet(set.id) }
         } message: { _ in
-            Text("Se borrará el conjunto y sus valores guardados en este iPhone. Los secretos ya enviados a GitHub no se modifican.")
+            Text("Se borrará el preset y sus valores guardados en este iPhone. Lo ya aplicado en GitHub no se modifica.")
         }
     }
 

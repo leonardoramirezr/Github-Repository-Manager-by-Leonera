@@ -19,6 +19,9 @@ final class AppState {
     private static let settingsKey = "settings"
     /// How many repositories are sent to at the same time.
     private static let parallelUploads = 4
+    /// Progress rows of the repository settings steps, shown before the secrets.
+    private static let pullRequestsStepID = UUID()
+    private static let pagesStepID = UUID()
 
     // Connection
     var settings: AppSettings
@@ -125,10 +128,10 @@ final class AppState {
     // MARK: - Secret sets
 
     func addSet() {
-        var name = "Nuevo conjunto"
+        var name = "Nuevo preset"
         var counter = 2
         while secretSets.contains(where: { $0.name == name }) {
-            name = "Nuevo conjunto \(counter)"
+            name = "Nuevo preset \(counter)"
             counter += 1
         }
         let set = SecretSet(name: name, secrets: [SecretItem()])
@@ -168,7 +171,7 @@ final class AppState {
     func saveNow() {
         saveTask?.cancel()
         guard !loadFailed else {
-            storageError = "Los conjuntos guardados no se pudieron leer del Llavero, así que los cambios no se guardarán para no sobrescribirlos. Cierra la app por completo y vuelve a abrirla."
+            storageError = "Los presets guardados no se pudieron leer del Llavero, así que los cambios no se guardarán para no sobrescribirlos. Cierra la app por completo y vuelve a abrirla."
             return
         }
         do {
@@ -182,7 +185,8 @@ final class AppState {
 
     // MARK: - Upload
 
-    /// Sends every secret of the set to each of its repositories (or only to `only`, to retry).
+    /// Applies the preset (repository settings and secrets) to each of its repositories
+    /// (or only to `only`, to retry).
     func upload(setID: SecretSet.ID, only: [String]? = nil) async {
         guard let client, let set = secretSets.first(where: { $0.id == setID }), !isUploading else { return }
         let targets = only ?? set.repositories
@@ -190,11 +194,18 @@ final class AppState {
 
         uploadSetID = setID
         uploadSetName = set.displayName
-        uploadDestination = set.destinationDescription
+        uploadDestination = set.actionsDescription
+        var steps: [UploadResult] = []
+        if set.repositorySettings != nil {
+            steps.append(UploadResult(id: Self.pullRequestsStepID, name: "Ajustes de pull requests"))
+        }
+        if set.pages != nil {
+            steps.append(UploadResult(id: Self.pagesStepID, name: "GitHub Pages"))
+        }
         uploads = targets.map { repository in
             RepositoryUpload(
                 repository: repository,
-                results: set.secrets.map { UploadResult(id: $0.id, name: $0.normalizedName) }
+                results: steps + set.secrets.map { UploadResult(id: $0.id, name: $0.normalizedName) }
             )
         }
         isUploading = true
@@ -233,6 +244,18 @@ final class AppState {
     }
 
     private func send(_ set: SecretSet, to repository: String, client: GitHubClient) async {
+        if let settings = set.repositorySettings {
+            await runStep(Self.pullRequestsStepID, in: repository) {
+                try await client.applyRepositorySettings(repository, settings)
+            }
+        }
+        if let pages = set.pages {
+            await runStep(Self.pagesStepID, in: repository) {
+                try await client.applyPages(repository, pages)
+            }
+        }
+        guard !set.secrets.isEmpty else { return }
+
         let environment = set.trimmedEnvironment
         let key: RepositoryPublicKey
         do {
@@ -241,17 +264,25 @@ final class AppState {
             }
             key = try await client.publicKey(repository: repository, target: set.target, environment: environment)
         } catch {
+            let message = error.localizedDescription
             update(repository) { upload in
-                upload.error = error.localizedDescription
-                for index in upload.results.indices {
-                    upload.results[index].status = .failed("No se envió")
+                if set.hasRepositoryChanges {
+                    // Keep the results of the settings steps; only the secrets failed.
+                    for secret in set.secrets {
+                        upload.setStatus(.failed(message), for: secret.id)
+                    }
+                } else {
+                    upload.error = message
+                    for index in upload.results.indices {
+                        upload.results[index].status = .failed("No se envió")
+                    }
                 }
             }
             return
         }
 
-        for (index, secret) in set.secrets.enumerated() {
-            update(repository) { $0.results[index].status = .running }
+        for secret in set.secrets {
+            update(repository) { $0.setStatus(.running, for: secret.id) }
             let status: UploadResult.Status
             do {
                 let result = try await client.putSecret(
@@ -266,8 +297,20 @@ final class AppState {
             } catch {
                 status = .failed(error.localizedDescription)
             }
-            update(repository) { $0.results[index].status = status }
+            update(repository) { $0.setStatus(status, for: secret.id) }
         }
+    }
+
+    private func runStep(_ id: UUID, in repository: String, _ operation: () async throws -> Void) async {
+        update(repository) { $0.setStatus(.running, for: id) }
+        let status: UploadResult.Status
+        do {
+            try await operation()
+            status = .updated
+        } catch {
+            status = .failed(error.localizedDescription)
+        }
+        update(repository) { $0.setStatus(status, for: id) }
     }
 
     private func update(_ repository: String, _ change: (inout RepositoryUpload) -> Void) {

@@ -32,7 +32,7 @@ struct ConnectionSections: View {
             Text("Token de acceso personal")
         } footer: {
             VStack(alignment: .leading, spacing: 8) {
-                Text("Necesita permiso de escritura sobre los secretos: en un token *fine-grained*, «Secrets: Read and write» (y «Dependabot secrets», «Codespaces secrets» o «Environments» si los usas); en uno clásico, el scope `repo`.")
+                Text("Necesita permiso de escritura sobre los secretos: en un token *fine-grained*, «Secrets: Read and write» (y «Dependabot secrets», «Codespaces secrets» o «Environments» si los usas; «Administration» y «Pages» para los ajustes de repositorio); en uno clásico, el scope `repo`.")
                 HStack(spacing: 16) {
                     Link("Crear fine-grained", destination: tokenURL("settings/personal-access-tokens/new"))
                     Link("Crear clásico", destination: tokenURL("settings/tokens/new?scopes=repo&description=Repository%20Manager"))
@@ -136,7 +136,7 @@ struct OnboardingView: View {
                             .symbolRenderingMode(.hierarchical)
                         Text("Repository Manager")
                             .font(.title.bold())
-                        Text("Guarda conjuntos de secretos y súbelos a uno o varios repositorios de GitHub de una vez.")
+                        Text("Guarda presets de secretos y ajustes, y aplícalos a uno o varios repositorios de GitHub de una vez.")
                             .font(.subheadline)
                             .multilineTextAlignment(.center)
                             .foregroundStyle(.secondary)
@@ -214,7 +214,7 @@ struct SettingsView: View {
                     dismiss()
                 }
             } message: {
-                Text("Se borrará el token del Llavero. Tus conjuntos de secretos se conservan.")
+                Text("Se borrará el token del Llavero. Tus presets se conservan.")
             }
         }
     }

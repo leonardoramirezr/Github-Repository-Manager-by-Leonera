@@ -24,7 +24,12 @@ struct RootView: View {
     var body: some View {
         Group {
             if state.isConfigured {
-                SetsListView()
+                TabView {
+                    SetsListView()
+                        .tabItem { Label("Presets", systemImage: "slider.horizontal.3") }
+                    RepositoriesView()
+                        .tabItem { Label("Repositorios", systemImage: "book.closed") }
+                }
             } else {
                 OnboardingView()
             }
