@@ -8,7 +8,7 @@ options:
 settings:
   base:
     # Overridden by CI (build settings passed to xcodebuild).
-    APP_BUNDLE_ID: com.leonardoramirezr.ios-github-repository-manager-by-leonera
+    APP_BUNDLE_ID: com.leonardoramirezr.repository-manager-by-leonera
     MARKETING_VERSION: "0.0.0"
     CURRENT_PROJECT_VERSION: "1"
     DEVELOPMENT_TEAM: ""
@@ -29,7 +29,7 @@ targets:
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
         GENERATE_INFOPLIST_FILE: YES
-        INFOPLIST_KEY_CFBundleDisplayName: Repo Manager
+        INFOPLIST_KEY_CFBundleDisplayName: Repo Manager by Leonera
         INFOPLIST_KEY_LSApplicationCategoryType: public.app-category.developer-tools
         INFOPLIST_KEY_UILaunchScreen_Generation: YES
         INFOPLIST_KEY_UIApplicationSceneManifest_Generation: YES
