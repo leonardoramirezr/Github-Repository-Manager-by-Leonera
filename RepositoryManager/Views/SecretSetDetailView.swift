@@ -235,7 +235,7 @@ struct SecretSetDetailView: View {
         } footer: {
             switch secretSet.pages?.buildType {
             case .legacy:
-                Text("Los repositorios publicarán Pages desde la rama y carpeta indicadas (vacío = rama por defecto de cada uno). Si Pages no está activado, se activa.")
+                Text("Los repositorios publicarán Pages desde la rama y carpeta indicadas (vacío = rama por defecto de cada uno). Si la rama no existe, se crea desde el último commit de main. Si Pages no está activado, se activa.")
             case .workflow:
                 Text("Los repositorios publicarán Pages con un workflow de GitHub Actions. Si Pages no está activado, se activa.")
             case nil:
