@@ -17,6 +17,16 @@ struct GitHubError: LocalizedError {
     }
 }
 
+/// The Pages branch is missing and there is no commit to create it from (e.g. an empty repository).
+struct MissingBaseBranchError: LocalizedError {
+    let branch: String
+    let base: String
+
+    var errorDescription: String? {
+        "La rama \(branch) no existe y no se puede crear: la rama \(base) no tiene commits."
+    }
+}
+
 struct GitHubUser: Decodable {
     let login: String
     let name: String?
@@ -63,6 +73,14 @@ struct RepositoryDetails: Decodable {
             allowRebaseMerge: allowRebaseMerge ?? true
         )
     }
+}
+
+private struct GitReference: Decodable {
+    struct Object: Decodable {
+        let sha: String
+    }
+
+    let object: Object
 }
 
 private struct PagesSite: Decodable {
@@ -273,11 +291,52 @@ struct GitHubClient {
     }
 
     /// Updates the build source of an existing Pages site, or enables Pages when `create` is true.
+    /// A `.legacy` branch that does not exist yet is created first (see `ensureBranch`).
     func savePages(_ repository: String, _ pages: PagesSettings, create: Bool) async throws {
         var body: [String: Any] = ["build_type": pages.buildType.rawValue]
         if pages.buildType == .legacy {
+            try await ensureBranch(repository, pages.trimmedBranch)
             body["source"] = ["branch": pages.trimmedBranch, "path": pages.path]
         }
         _ = try await request(create ? "POST" : "PUT", url(repoSegments(repository) + ["pages"]), body: body)
+    }
+
+    // MARK: - Branches
+
+    /// "feature/x" → ["feature", "x"], so branch names with slashes stay readable in the path.
+    private func branchSegments(_ branch: String) -> [String] {
+        branch.split(separator: "/").map(String.init)
+    }
+
+    /// Latest commit of `branch`, or nil when the branch does not exist.
+    func branchHead(_ repository: String, _ branch: String) async throws -> String? {
+        do {
+            let reference = try await get(
+                url(repoSegments(repository) + ["git", "ref", "heads"] + branchSegments(branch)),
+                as: GitReference.self
+            )
+            return reference.object.sha
+        } catch let error as GitHubError where error.statusCode == 404 {
+            return nil
+        }
+    }
+
+    /// Creates `branch` from the latest commit of `main` (or of the default branch when there is no `main`)
+    /// when it does not exist yet. Existing branches are left untouched.
+    func ensureBranch(_ repository: String, _ branch: String) async throws {
+        guard try await branchHead(repository, branch) == nil else { return }
+        var base = "main"
+        var sha = try await branchHead(repository, base)
+        if sha == nil {
+            base = try await repositoryDetails(repository).defaultBranch
+            sha = try await branchHead(repository, base)
+        }
+        guard let sha else {
+            throw MissingBaseBranchError(branch: branch, base: base)
+        }
+        _ = try await request("POST", url(repoSegments(repository) + ["git", "refs"]), body: [
+            "ref": "refs/heads/\(branch)",
+            "sha": sha,
+        ])
     }
 }

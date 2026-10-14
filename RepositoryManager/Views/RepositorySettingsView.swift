@@ -282,7 +282,7 @@ struct RepositorySettingsView: View {
             } else if pages?.buildType == .workflow {
                 Text("El sitio se publica con un workflow de GitHub Actions.")
             } else if pages != nil {
-                Text("El sitio se publica desde la rama y carpeta indicadas.")
+                Text("El sitio se publica desde la rama y carpeta indicadas. Si la rama no existe, se crea desde el último commit de main.")
             }
         }
     }
