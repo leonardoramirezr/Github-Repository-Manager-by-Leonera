@@ -83,6 +83,34 @@ private struct GitReference: Decodable {
     let object: Object
 }
 
+private struct GitCommit: Decodable {
+    struct Tree: Decodable {
+        let sha: String
+    }
+
+    let sha: String
+    let tree: Tree
+    let htmlURL: URL?
+
+    enum CodingKeys: String, CodingKey {
+        case sha
+        case tree
+        case htmlURL = "html_url"
+    }
+}
+
+private struct BranchSummary: Decodable {
+    let name: String
+}
+
+/// Commit created by `createEmptyCommit`.
+struct CreatedCommit {
+    let sha: String
+    let htmlURL: URL?
+
+    var shortSHA: String { String(sha.prefix(7)) }
+}
+
 private struct PagesSite: Decodable {
     struct Source: Decodable {
         let branch: String
@@ -338,5 +366,42 @@ struct GitHubClient {
             "ref": "refs/heads/\(branch)",
             "sha": sha,
         ])
+    }
+
+    /// Names of every branch of the repository.
+    func branches(_ repository: String) async throws -> [String] {
+        var all: [String] = []
+        let perPage = 100
+        for page in 1...50 {
+            let pageURL = url(repoSegments(repository) + ["branches"], query: [
+                URLQueryItem(name: "per_page", value: String(perPage)),
+                URLQueryItem(name: "page", value: String(page)),
+            ])
+            let batch = try await get(pageURL, as: [BranchSummary].self)
+            all += batch.map(\.name)
+            if batch.count < perPage { break }
+        }
+        return all.sorted { $0.localizedCaseInsensitiveCompare($1) == .orderedAscending }
+    }
+
+    /// Adds a commit without changes (same tree as the current head) on top of `branch`.
+    /// The branch is only fast-forwarded: if someone pushed meanwhile GitHub rejects the update.
+    func createEmptyCommit(_ repository: String, branch: String, message: String) async throws -> CreatedCommit {
+        let git = repoSegments(repository) + ["git"]
+        guard let head = try await branchHead(repository, branch) else {
+            throw GitHubError(statusCode: 404, message: "La rama \(branch) no existe")
+        }
+        let parent = try await get(url(git + ["commits", head]), as: GitCommit.self)
+        let (data, _) = try await request("POST", url(git + ["commits"]), body: [
+            "message": message,
+            "tree": parent.tree.sha,
+            "parents": [head],
+        ])
+        let commit = try JSONDecoder().decode(GitCommit.self, from: data)
+        _ = try await request("PATCH", url(git + ["refs", "heads"] + branchSegments(branch)), body: [
+            "sha": commit.sha,
+            "force": false,
+        ])
+        return CreatedCommit(sha: commit.sha, htmlURL: commit.htmlURL)
     }
 }

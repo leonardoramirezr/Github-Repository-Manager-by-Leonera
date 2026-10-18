@@ -159,6 +159,17 @@ struct RepositorySettingsView: View {
                 }
                 pullRequestsSection(details)
                 pagesSection(details)
+                Section {
+                    NavigationLink {
+                        EmptyCommitView(repository: repository, defaultBranch: details.defaultBranch)
+                    } label: {
+                        Label("Commit vacío", systemImage: "plus.circle")
+                    }
+                } header: {
+                    Text("Commits")
+                } footer: {
+                    Text("Crea un commit sin cambios en una rama, por ejemplo para volver a lanzar sus workflows.")
+                }
                 if let saveError {
                     Section {
                         Label(saveError, systemImage: "exclamationmark.triangle.fill")
