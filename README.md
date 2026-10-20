@@ -22,6 +22,7 @@ SwiftUI, iOS 17 o posterior y **ninguna dependencia de terceros** (el proyecto d
 - **Importar `.env`**: pegar líneas `CLAVE=valor` o abrir un archivo desde Archivos; los secretos existentes se actualizan.
 - **Validación** de nombres según las reglas de GitHub (letras, números y `_`, sin empezar por número ni por `GITHUB_`, sin duplicados).
 - **Ajustes de un repositorio** (pestaña *Repositorios*): consultar y cambiar, para un solo repositorio, quién puede crear pull requests (**todos los usuarios** o **solo colaboradores**), los métodos de merge permitidos (**merge commits**, **squash merging** y **rebase merging**, al menos uno activado) y el origen de **GitHub Pages › Build and deployment**: **desde una rama** (rama y carpeta `/` o `/docs`; si la rama no existe, se crea desde el último commit de `main`) o **GitHub Actions**. Si Pages no está activado, se activa con el origen elegido. Desde la misma pantalla, **Commit vacío** crea un commit sin cambios en la rama que elijas (con el mensaje que quieras), por ejemplo para volver a lanzar sus workflows.
+- **Pull de main** (pestaña *Repositorios*, dentro de un repositorio): eliges una rama y la app comprueba si traer los cambios de `main` daría conflictos. Sin conflictos aparece el botón **Pull de main**, que hace un merge en GitHub; con conflictos, el botón queda desactivado y se listan los archivos. GitHub no ofrece una simulación de merge, así que la comprobación se hace en el iPhone con las reglas de `git merge` (por archivo y por líneas). Limitaciones: no detecta renombrados (un archivo renombrado en una rama y editado en la otra aparece como conflicto), y en líneas repetidas ambiguas (p. ej. llaves o líneas vacías) puede no coincidir con git. Si la comprobación da «sin conflictos» pero GitHub rechaza el merge, la rama no cambia.
 - **Aplicar** el preset a todos los repositorios seleccionados (varios en paralelo) con progreso por repositorio, por ajuste y por secreto, resumen de creados/actualizados/fallidos y botón para **reintentar solo los repositorios que fallaron**.
 
 ## Seguridad
@@ -34,7 +35,7 @@ SwiftUI, iOS 17 o posterior y **ninguna dependencia de terceros** (el proyecto d
 
 | Tipo de token | Permisos necesarios |
 |---------------|---------------------|
-| Fine-grained  | Acceso a los repositorios de destino, **Secrets: Read and write** (y **Dependabot secrets**, **Codespaces secrets** o **Environments: Read and write** si usas esos tipos). Para los ajustes de repositorio (presets o pestaña *Repositorios*), **Administration: Read and write** y **Pages: Read and write** (más **Contents: Read and write** para crear la rama de Pages si no existe o para crear commits vacíos). *Metadata: Read* se incluye automáticamente. |
+| Fine-grained  | Acceso a los repositorios de destino, **Secrets: Read and write** (y **Dependabot secrets**, **Codespaces secrets** o **Environments: Read and write** si usas esos tipos). Para los ajustes de repositorio (presets o pestaña *Repositorios*), **Administration: Read and write** y **Pages: Read and write** (más **Contents: Read and write** para crear la rama de Pages si no existe, crear commits vacíos o hacer pull de main). *Metadata: Read* se incluye automáticamente. |
 | Clásico       | Scope `repo` (`public_repo` basta solo para repositorios públicos). |
 
 Los ajustes de repositorio requieren además que tu usuario sea **administrador** del repositorio.
@@ -88,7 +89,7 @@ Requiere macOS con Xcode 16 y XcodeGen (`brew install xcodegen`).
 ```sh
 make project   # genera RepositoryManager.xcodeproj desde project.yml
 make open      # lo genera y lo abre en Xcode
-make test      # tests de cifrado
+make test      # tests de cifrado y de comprobación de conflictos
 ```
 
 Para ejecutarla en un dispositivo desde Xcode, elige tu equipo en *Signing & Capabilities* (o pasa `DEVELOPMENT_TEAM`).
@@ -105,6 +106,7 @@ Para ejecutarla en un dispositivo desde Xcode, elige tu equipo en *Signing & Cap
 │   ├── Model/Models.swift              # SecretSet, SecretItem, ajustes, .env, validación
 │   ├── Services/
 │   │   ├── GitHubClient.swift          # Cliente de la API REST de GitHub
+│   │   ├── MergeCheck.swift            # Comprobación de conflictos con main (reglas de git merge)
 │   │   ├── SealedBox.swift             # Sealed box compatible con libsodium
 │   │   └── KeychainStore.swift         # Persistencia en el Llavero
 │   ├── Views/
@@ -115,9 +117,11 @@ Para ejecutarla en un dispositivo desde Xcode, elige tu equipo en *Signing & Cap
 │   │   ├── UploadView.swift            # Progreso y resultados del envío
 │   │   ├── RepositorySettingsView.swift # Pestaña Repositorios: pull requests y GitHub Pages
 │   │   ├── EmptyCommitView.swift       # Commit vacío en una rama
+│   │   ├── PullMainView.swift          # Pull de main tras comprobar conflictos
 │   │   └── ConnectionViews.swift       # Bienvenida y Ajustes
 │   └── Resources/Assets.xcassets       # Icono y color de acento
 ├── tests/SealedBoxTests.swift          # Vectores de prueba del cifrado
+├── tests/MergeCheckTests.swift         # Casos de conflicto verificados con git
 ├── scripts/
 │   ├── asc.py                          # API de App Store Connect (validación y revocación)
 │   ├── publish-pages.sh                # Publicación en la rama gh-pages

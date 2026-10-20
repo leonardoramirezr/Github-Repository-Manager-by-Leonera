@@ -161,6 +161,17 @@ struct RepositorySettingsView: View {
                 pagesSection(details)
                 Section {
                     NavigationLink {
+                        PullMainView(repository: repository)
+                    } label: {
+                        Label("Pull de main", systemImage: "arrow.down.circle")
+                    }
+                } header: {
+                    Text("Ramas")
+                } footer: {
+                    Text("Comprueba si una rama tiene conflictos con main y, si no los tiene, trae a esa rama los cambios de main.")
+                }
+                Section {
+                    NavigationLink {
                         EmptyCommitView(repository: repository, defaultBranch: details.defaultBranch)
                     } label: {
                         Label("Commit vacío", systemImage: "plus.circle")

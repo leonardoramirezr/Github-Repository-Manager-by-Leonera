@@ -111,6 +111,61 @@ struct CreatedCommit {
     var shortSHA: String { String(sha.prefix(7)) }
 }
 
+/// Result of pulling `main` into a branch with `mergeIntoBranch`.
+enum MergeOutcome {
+    case merged(CreatedCommit)
+    /// The branch already contained `main`, so GitHub made no change.
+    case alreadyUpToDate
+    /// GitHub refused the merge because it conflicts. The branch was not changed.
+    case conflict
+}
+
+/// `GET /repos/{owner}/{repo}/compare/{base}...{head}`, only the fields the pull check uses.
+private struct Comparison: Decodable {
+    struct MergeBase: Decodable {
+        let sha: String
+    }
+
+    /// Commits of `head` that `base` does not have yet.
+    let aheadBy: Int
+    let mergeBaseCommit: MergeBase?
+
+    enum CodingKeys: String, CodingKey {
+        case aheadBy = "ahead_by"
+        case mergeBaseCommit = "merge_base_commit"
+    }
+}
+
+/// `GET /repos/{owner}/{repo}/git/trees/{sha}?recursive=1`
+private struct GitTree: Decodable {
+    struct Entry: Decodable {
+        let path: String
+        /// "blob" (file), "commit" (submodule) or "tree" (directory).
+        let type: String
+        let sha: String
+    }
+
+    let tree: [Entry]
+    let truncated: Bool
+}
+
+/// `GET /repos/{owner}/{repo}/git/blobs/{sha}`
+private struct GitBlob: Decodable {
+    let content: String
+    let encoding: String
+}
+
+/// Commit returned by `POST /repos/{owner}/{repo}/merges`.
+private struct MergedCommit: Decodable {
+    let sha: String
+    let htmlURL: URL?
+
+    enum CodingKeys: String, CodingKey {
+        case sha
+        case htmlURL = "html_url"
+    }
+}
+
 private struct PagesSite: Decodable {
     struct Source: Decodable {
         let branch: String
@@ -403,5 +458,128 @@ struct GitHubClient {
             "force": false,
         ])
         return CreatedCommit(sha: commit.sha, htmlURL: commit.htmlURL)
+    }
+
+    // MARK: - Pull de main
+
+    /// Whether merging `head` into `branch` would conflict. Nothing in the repository changes.
+    /// GitHub has no dry run for merges, so the files are compared here (see `MergeCheck`).
+    func mergeCheck(_ repository: String, branch: String, head: String = "main") async throws -> MergeCheck.Status {
+        guard let branchSHA = try await branchHead(repository, branch) else {
+            return .unverifiable(reason: "La rama \(branch) no existe.")
+        }
+        guard let headSHA = try await branchHead(repository, head) else {
+            return .unverifiable(reason: "El repositorio no tiene una rama \(head).")
+        }
+        let comparison = try await get(
+            url(repoSegments(repository) + ["compare", "\(branchSHA)...\(headSHA)"]),
+            as: Comparison.self
+        )
+        if comparison.aheadBy == 0 { return .upToDate }
+        guard let baseSHA = comparison.mergeBaseCommit?.sha else {
+            return .unverifiable(reason: "\(branch) y \(head) no tienen ningún commit en común.")
+        }
+
+        async let baseFiles = treeFiles(repository, commit: baseSHA)
+        async let branchFiles = treeFiles(repository, commit: branchSHA)
+        async let headFiles = treeFiles(repository, commit: headSHA)
+        let trees = try await (baseFiles, branchFiles, headFiles)
+        guard let base = trees.0, let ours = trees.1, let theirs = trees.2 else {
+            return .unverifiable(reason: "El repositorio es demasiado grande para comprobarlo en el iPhone.")
+        }
+
+        let plan = MergeCheck.plan(base: base, ours: ours, theirs: theirs)
+        let checked = try await withThrowingTaskGroup(
+            of: (String, MergeCheck.ContentResult).self,
+            returning: [(String, MergeCheck.ContentResult)].self
+        ) { group in
+            for candidate in plan.candidates {
+                group.addTask {
+                    let versions = try await self.versions(repository, candidate)
+                    let result = MergeCheck.fileMerge(base: versions.base, ours: versions.ours, theirs: versions.theirs)
+                    return (candidate.path, result)
+                }
+            }
+            var collected: [(String, MergeCheck.ContentResult)] = []
+            for try await item in group {
+                collected.append(item)
+            }
+            return collected
+        }
+
+        var conflicts = plan.conflicts
+        var tooLarge: String?
+        for (path, result) in checked {
+            switch result {
+            case .clean:
+                break
+            case .conflict:
+                conflicts.append(path)
+            case .tooLarge:
+                tooLarge = tooLarge ?? path
+            }
+        }
+        if !conflicts.isEmpty {
+            return .conflicts(paths: conflicts.sorted())
+        }
+        if let tooLarge {
+            return .unverifiable(reason: "\(tooLarge) es demasiado grande para comprobarlo en el iPhone.")
+        }
+        return .clean(commits: comparison.aheadBy, mainSHA: headSHA)
+    }
+
+    /// Merges `head` (the commit of `main` that was checked) into `branch`. GitHub refuses a merge that
+    /// conflicts with 409, so a conflicting pull never changes the branch.
+    func mergeIntoBranch(_ repository: String, branch: String, head: String) async throws -> MergeOutcome {
+        do {
+            let (data, response) = try await request("POST", url(repoSegments(repository) + ["merges"]), body: [
+                "base": branch,
+                "head": head,
+            ])
+            if response.statusCode == 204 { return .alreadyUpToDate }
+            let merged = try JSONDecoder().decode(MergedCommit.self, from: data)
+            return .merged(CreatedCommit(sha: merged.sha, htmlURL: merged.htmlURL))
+        } catch let error as GitHubError where error.statusCode == 409 {
+            return .conflict
+        }
+    }
+
+    /// Files of `commit` by path, or nil when GitHub truncated the listing (the tree is too large).
+    private func treeFiles(_ repository: String, commit: String) async throws -> [String: TreeFile]? {
+        let git = repoSegments(repository) + ["git"]
+        let parent = try await get(url(git + ["commits", commit]), as: GitCommit.self)
+        let tree = try await get(
+            url(git + ["trees", parent.tree.sha], query: [URLQueryItem(name: "recursive", value: "1")]),
+            as: GitTree.self
+        )
+        guard !tree.truncated else { return nil }
+        var files: [String: TreeFile] = [:]
+        for entry in tree.tree where entry.type == "blob" || entry.type == "commit" {
+            files[entry.path] = TreeFile(sha: entry.sha, isSubmodule: entry.type == "commit")
+        }
+        return files
+    }
+
+    /// The three versions of a file that changed on both sides. `base` is nil when the file did not exist.
+    private func versions(
+        _ repository: String,
+        _ candidate: MergeCheck.Candidate
+    ) async throws -> (base: [UInt8]?, ours: [UInt8], theirs: [UInt8]) {
+        var base: [UInt8]?
+        if let sha = candidate.base {
+            base = try await blobBytes(repository, sha)
+        }
+        let ours = try await blobBytes(repository, candidate.ours)
+        let theirs = try await blobBytes(repository, candidate.theirs)
+        return (base, ours, theirs)
+    }
+
+    private func blobBytes(_ repository: String, _ sha: String) async throws -> [UInt8] {
+        let blob = try await get(url(repoSegments(repository) + ["git", "blobs", sha]), as: GitBlob.self)
+        guard blob.encoding == "base64" else { return Array(blob.content.utf8) }
+        guard let data = Data(base64Encoded: blob.content, options: .ignoreUnknownCharacters) else {
+            throw GitHubError(statusCode: 0, message: "Respuesta inesperada")
+        }
+        return [UInt8](data)
     }
 }
