@@ -27,6 +27,16 @@ struct MissingBaseBranchError: LocalizedError {
     }
 }
 
+/// GitHub cannot merge `head` into `base` automatically. Nothing is changed on `base`.
+struct MergeConflictError: LocalizedError {
+    let base: String
+    let head: String
+
+    var errorDescription: String? {
+        "No se puede hacer el pull: «\(head)» tiene cambios en conflicto con «\(base)». No se ha modificado nada; resuelve los conflictos en local y vuelve a intentarlo."
+    }
+}
+
 struct GitHubUser: Decodable {
     let login: String
     let name: String?
@@ -109,6 +119,24 @@ struct CreatedCommit {
     let htmlURL: URL?
 
     var shortSHA: String { String(sha.prefix(7)) }
+}
+
+/// Outcome of `pull`.
+enum BranchMergeResult {
+    /// The target branch already contained every commit of the source branch.
+    case upToDate
+    case merged(CreatedCommit)
+}
+
+/// Commit returned by the merges endpoint.
+private struct MergedCommit: Decodable {
+    let sha: String
+    let htmlURL: URL?
+
+    enum CodingKeys: String, CodingKey {
+        case sha
+        case htmlURL = "html_url"
+    }
 }
 
 private struct PagesSite: Decodable {
@@ -403,5 +431,21 @@ struct GitHubClient {
             "force": false,
         ])
         return CreatedCommit(sha: commit.sha, htmlURL: commit.htmlURL)
+    }
+
+    /// Merges `source` into `target` on GitHub (a "pull" between branches), creating a merge commit on `target`.
+    /// Throws `MergeConflictError` when the changes conflict.
+    func pull(_ repository: String, from source: String, into target: String) async throws -> BranchMergeResult {
+        do {
+            let (data, response) = try await request("POST", url(repoSegments(repository) + ["merges"]), body: [
+                "base": target,
+                "head": source,
+            ])
+            if response.statusCode == 204 { return .upToDate }
+            let merged = try JSONDecoder().decode(MergedCommit.self, from: data)
+            return .merged(CreatedCommit(sha: merged.sha, htmlURL: merged.htmlURL))
+        } catch let error as GitHubError where error.statusCode == 409 {
+            throw MergeConflictError(base: target, head: source)
+        }
     }
 }
