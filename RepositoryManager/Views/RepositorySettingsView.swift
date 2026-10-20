@@ -161,6 +161,17 @@ struct RepositorySettingsView: View {
                 pagesSection(details)
                 Section {
                     NavigationLink {
+                        BranchPullView(repository: repository, defaultBranch: details.defaultBranch)
+                    } label: {
+                        Label("Pull entre ramas", systemImage: "arrow.triangle.merge")
+                    }
+                } header: {
+                    Text("Ramas")
+                } footer: {
+                    Text("Trae los cambios de una rama a otra (por defecto, de main). Si hay conflictos, GitHub no hace el pull.")
+                }
+                Section {
+                    NavigationLink {
                         EmptyCommitView(repository: repository, defaultBranch: details.defaultBranch)
                     } label: {
                         Label("Commit vacío", systemImage: "plus.circle")
