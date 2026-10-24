@@ -1,0 +1,18 @@
+{
+  "tag": "build-17-7b762d2",
+  "app_name": "Repository Manager",
+  "version": "0.6.0",
+  "build": "17",
+  "bundle_id": "com.leonardoramirezr.repo-manager-by-leonera",
+  "stable": false,
+  "branch": "claude/pull-entre-ramas",
+  "commit": "7b762d26e866283c0da2f86149c06688387df124",
+  "date": "2026-10-20T18:09:34Z",
+  "run_url": "https://github.com/leonardoramirezr/iOS-Repo-Manager-by-Leonera/actions/runs/39472080690",
+  "devices": 1,
+  "ipa": "Repo Manager by Leonera.ipa",
+  "ipa_size": 432306,
+  "page_url": "https://leonardoramirezr.github.io/iOS-Repo-Manager-by-Leonera/build-17-7b762d2/",
+  "manifest_url": "https://leonardoramirezr.github.io/iOS-Repo-Manager-by-Leonera/build-17-7b762d2/manifest.plist",
+  "install_url": "itms-services://?action=download-manifest&url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Repo-Manager-by-Leonera%2Fbuild-17-7b762d2%2Fmanifest.plist"
+}

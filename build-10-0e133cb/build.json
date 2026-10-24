@@ -1,0 +1,18 @@
+{
+  "tag": "build-10-0e133cb",
+  "app_name": "Repository Manager",
+  "version": "0.3.0",
+  "build": "10",
+  "bundle_id": "com.leonardoramirezr.repo-manager-by-leonera",
+  "stable": false,
+  "branch": "claude/exciting-volta-n3cc3r",
+  "commit": "0e133cbaa64522385ba42ca12b218c10ae411b5f",
+  "date": "2026-10-13T23:13:24Z",
+  "run_url": "https://github.com/leonardoramirezr/iOS-Repo-Manager-by-Leonera/actions/runs/38482769755",
+  "devices": 1,
+  "ipa": "Repo Manager by Leonera.ipa",
+  "ipa_size": 363319,
+  "page_url": "https://leonardoramirezr.github.io/iOS-Repo-Manager-by-Leonera/build-10-0e133cb/",
+  "manifest_url": "https://leonardoramirezr.github.io/iOS-Repo-Manager-by-Leonera/build-10-0e133cb/manifest.plist",
+  "install_url": "itms-services://?action=download-manifest&url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Repo-Manager-by-Leonera%2Fbuild-10-0e133cb%2Fmanifest.plist"
+}

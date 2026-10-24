@@ -1,0 +1,18 @@
+{
+  "tag": "build-6-d727fd2",
+  "app_name": "Repository Manager",
+  "version": "0.2.0",
+  "build": "6",
+  "bundle_id": "com.leonardoramirezr.ios-github-repository-manager-by-leonera",
+  "stable": false,
+  "branch": "claude/exciting-volta-n3cc3r",
+  "commit": "d727fd2c1b0489221dd0e4ecafa4d09f92035e78",
+  "date": "2026-10-13T21:22:16Z",
+  "run_url": "https://github.com/leonardoramirezr/iOS-Github-Repository-Manager-by-Leonera/actions/runs/38469858665",
+  "devices": 1,
+  "ipa": "Repo Manager by Leonera.ipa",
+  "ipa_size": 363377,
+  "page_url": "https://leonardoramirezr.github.io/iOS-Github-Repository-Manager-by-Leonera/build-6-d727fd2/",
+  "manifest_url": "https://leonardoramirezr.github.io/iOS-Github-Repository-Manager-by-Leonera/build-6-d727fd2/manifest.plist",
+  "install_url": "itms-services://?action=download-manifest&url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Github-Repository-Manager-by-Leonera%2Fbuild-6-d727fd2%2Fmanifest.plist"
+}

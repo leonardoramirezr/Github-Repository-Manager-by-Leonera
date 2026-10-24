@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Repository Manager</title>
+<link rel="apple-touch-icon" href="0.7.0/icon-512.png">
+<style>
+:root { color-scheme: light dark; --bg: #f2f2f7; --card: #fff; --text: #1c1c1e; --muted: #6e6e73;
+        --accent: #5856d6; --line: rgba(60,60,67,.18); }
+@media (prefers-color-scheme: dark) {
+  :root { --bg: #000; --card: #1c1c1e; --text: #f2f2f7; --muted: #98989f; --accent: #7d7aff;
+          --line: rgba(84,84,88,.6); } }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text);
+       font: 17px/1.4 -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif; }
+main { max-width: 640px; margin: 0 auto; padding: 32px 16px 48px; }
+header { text-align: center; margin-bottom: 24px; }
+header img { width: 96px; height: 96px; border-radius: 22px; box-shadow: 0 4px 16px rgba(0,0,0,.15); }
+h1 { font-size: 28px; margin: 12px 0 4px; }
+h2 { font-size: 13px; font-weight: 400; text-transform: uppercase; color: var(--muted); margin: 28px 16px 8px; }
+.muted { color: var(--muted); }
+.card { background: var(--card); border-radius: 12px; overflow: hidden; }
+.row { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-top: .5px solid var(--line);
+       color: inherit; text-decoration: none; }
+.row:first-child { border-top: 0; }
+.row .grow { flex: 1; min-width: 0; }
+.row .title { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.row .sub { font-size: 14px; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.button { display: block; text-align: center; background: var(--accent); color: #fff; font-weight: 600;
+          padding: 14px 20px; border-radius: 12px; text-decoration: none; font-size: 17px; }
+.button.small { display: inline-block; padding: 6px 14px; border-radius: 16px; font-size: 15px; }
+.badge { font-size: 12px; font-weight: 600; padding: 2px 8px; border-radius: 10px; background: var(--line); }
+.badge.stable { background: #34c759; color: #fff; }
+dl { margin: 0; }
+dl div { display: flex; justify-content: space-between; gap: 16px; padding: 11px 16px;
+         border-top: .5px solid var(--line); }
+dl div:first-child { border-top: 0; }
+dt { color: var(--muted); } dd { margin: 0; text-align: right; overflow-wrap: anywhere; }
+.notes { font-size: 14px; color: var(--muted); margin: 8px 16px; }
+footer { text-align: center; font-size: 13px; color: var(--muted); margin-top: 32px; }
+a { color: var(--accent); }
+</style>
+</head>
+<body><main>
+
+<header>
+  <img src="0.7.0/icon-512.png" alt="">
+  <h1>Repository Manager</h1>
+  <div class="muted">Instalación Ad Hoc desde Safari</div>
+</header>
+
+<a class="button" href="itms-services://?action=download-manifest&amp;url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Repo-Manager-by-Leonera%2F0.7.0%2Fmanifest.plist">Instalar la última versión estable (0.7.0)</a>
+<p class="notes" style="text-align:center">Publicada el 24/10/2026 05:25 UTC ·
+<a href="0.7.0/">detalles</a></p>
+<h2>Todos los builds (20)</h2>
+<div class="card">
+<div class="row">
+  <a class="grow" href="0.7.0/" style="color:inherit;text-decoration:none">
+    <div class="title">0.7.0 <span class="badge stable">Estable</span></div>
+    <div class="sub">main · 0.7.0 (21) · 24/10/2026 05:25 UTC</div>
+  </a>
+  <a class="button small" href="itms-services://?action=download-manifest&amp;url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Repo-Manager-by-Leonera%2F0.7.0%2Fmanifest.plist">Instalar</a>
+</div>
+<div class="row">
+  <a class="grow" href="build-20-9bb427c/" style="color:inherit;text-decoration:none">
+    <div class="title">build-20-9bb427c </div>
+    <div class="sub">claude/amazing-albattani-9oe1z7 · 0.7.0 (20) · 24/10/2026 03:48 UTC</div>
+  </a>
+  <a class="button small" href="itms-services://?action=download-manifest&amp;url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Repo-Manager-by-Leonera%2Fbuild-20-9bb427c%2Fmanifest.plist">Instalar</a>
+</div>
+<div class="row">
+  <a class="grow" href="0.6.0/" style="color:inherit;text-decoration:none">
+    <div class="title">0.6.0 <span class="badge stable">Estable</span></div>
+    <div class="sub">main · 0.6.0 (19) · 20/10/2026 18:27 UTC</div>
+  </a>
+  <a class="button small" href="itms-services://?action=download-manifest&amp;url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Repo-Manager-by-Leonera%2F0.6.0%2Fmanifest.plist">Instalar</a>
+</div>
+<div class="row">
+  <a class="grow" href="build-18-9eabd85/" style="color:inherit;text-decoration:none">
+    <div class="title">build-18-9eabd85 </div>
+    <div class="sub">claude/pull-main-conflict-check · 0.6.0 (18) · 20/10/2026 18:19 UTC</div>
+  </a>
+  <a class="button small" href="itms-services://?action=download-manifest&amp;url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Repo-Manager-by-Leonera%2Fbuild-18-9eabd85%2Fmanifest.plist">Instalar</a>
+</div>
+<div class="row">
+  <a class="grow" href="build-17-7b762d2/" style="color:inherit;text-decoration:none">
+    <div class="title">build-17-7b762d2 </div>
+    <div class="sub">claude/pull-entre-ramas · 0.6.0 (17) · 20/10/2026 18:09 UTC</div>
+  </a>
+  <a class="button small" href="itms-services://?action=download-manifest&amp;url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Repo-Manager-by-Leonera%2Fbuild-17-7b762d2%2Fmanifest.plist">Instalar</a>
+</div>
+<div class="row">
+  <a class="grow" href="0.5.0/" style="color:inherit;text-decoration:none">
+    <div class="title">0.5.0 <span class="badge stable">Estable</span></div>
+    <div class="sub">main · 0.5.0 (16) · 18/10/2026 06:00 UTC</div>
+  </a>
+  <a class="button small" href="itms-services://?action=download-manifest&amp;url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Repo-Manager-by-Leonera%2F0.5.0%2Fmanifest.plist">Instalar</a>
+</div>
+<div class="row">
+  <a class="grow" href="build-15-80d0ba8/" style="color:inherit;text-decoration:none">
+    <div class="title">build-15-80d0ba8 </div>
+    <div class="sub">feature/empty-commit · 0.5.0 (15) · 18/10/2026 05:52 UTC</div>
+  </a>
+  <a class="button small" href="itms-services://?action=download-manifest&amp;url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Repo-Manager-by-Leonera%2Fbuild-15-80d0ba8%2Fmanifest.plist">Instalar</a>
+</div>
+<div class="row">
+  <a class="grow" href="0.4.0/" style="color:inherit;text-decoration:none">
+    <div class="title">0.4.0 <span class="badge stable">Estable</span></div>
+    <div class="sub">main · 0.4.0 (14) · 14/10/2026 06:07 UTC</div>
+  </a>
+  <a class="button small" href="itms-services://?action=download-manifest&amp;url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Repo-Manager-by-Leonera%2F0.4.0%2Fmanifest.plist">Instalar</a>
+</div>
+<div class="row">
+  <a class="grow" href="build-13-54e7b31/" style="color:inherit;text-decoration:none">
+    <div class="title">build-13-54e7b31 </div>
+    <div class="sub">claude/auto-create-deployment-branch-putg72 · 0.4.0 (13) · 14/10/2026 05:14 UTC</div>
+  </a>
+  <a class="button small" href="itms-services://?action=download-manifest&amp;url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Repo-Manager-by-Leonera%2Fbuild-13-54e7b31%2Fmanifest.plist">Instalar</a>
+</div>
+<div class="row">
+  <a class="grow" href="0.3.0/" style="color:inherit;text-decoration:none">
+    <div class="title">0.3.0 <span class="badge stable">Estable</span></div>
+    <div class="sub">main · 0.3.0 (12) · 13/10/2026 23:41 UTC</div>
+  </a>
+  <a class="button small" href="itms-services://?action=download-manifest&amp;url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Repo-Manager-by-Leonera%2F0.3.0%2Fmanifest.plist">Instalar</a>
+</div>
+<div class="row">
+  <a class="grow" href="build-11-0b502a3/" style="color:inherit;text-decoration:none">
+    <div class="title">build-11-0b502a3 </div>
+    <div class="sub">claude/exciting-volta-n3cc3r · 0.3.0 (11) · 13/10/2026 23:30 UTC</div>
+  </a>
+  <a class="button small" href="itms-services://?action=download-manifest&amp;url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Repo-Manager-by-Leonera%2Fbuild-11-0b502a3%2Fmanifest.plist">Instalar</a>
+</div>
+<div class="row">
+  <a class="grow" href="build-10-0e133cb/" style="color:inherit;text-decoration:none">
+    <div class="title">build-10-0e133cb </div>
+    <div class="sub">claude/exciting-volta-n3cc3r · 0.3.0 (10) · 13/10/2026 23:13 UTC</div>
+  </a>
+  <a class="button small" href="itms-services://?action=download-manifest&amp;url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Repo-Manager-by-Leonera%2Fbuild-10-0e133cb%2Fmanifest.plist">Instalar</a>
+</div>
+<div class="row">
+  <a class="grow" href="build-8-3cd88af/" style="color:inherit;text-decoration:none">
+    <div class="title">build-8-3cd88af </div>
+    <div class="sub">claude/gracious-volta-yq762l · 0.3.0 (8) · 13/10/2026 23:07 UTC</div>
+  </a>
+  <a class="button small" href="itms-services://?action=download-manifest&amp;url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Repo-Manager-by-Leonera%2Fbuild-8-3cd88af%2Fmanifest.plist">Instalar</a>
+</div>
+<div class="row">
+  <a class="grow" href="0.2.0/" style="color:inherit;text-decoration:none">
+    <div class="title">0.2.0 <span class="badge stable">Estable</span></div>
+    <div class="sub">main · 0.2.0 (7) · 13/10/2026 23:00 UTC</div>
+  </a>
+  <a class="button small" href="itms-services://?action=download-manifest&amp;url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Repo-Manager-by-Leonera%2F0.2.0%2Fmanifest.plist">Instalar</a>
+</div>
+<div class="row">
+  <a class="grow" href="build-6-d727fd2/" style="color:inherit;text-decoration:none">
+    <div class="title">build-6-d727fd2 </div>
+    <div class="sub">claude/exciting-volta-n3cc3r · 0.2.0 (6) · 13/10/2026 21:22 UTC</div>
+  </a>
+  <a class="button small" href="itms-services://?action=download-manifest&amp;url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Github-Repository-Manager-by-Leonera%2Fbuild-6-d727fd2%2Fmanifest.plist">Instalar</a>
+</div>
+<div class="row">
+  <a class="grow" href="0.1.0/" style="color:inherit;text-decoration:none">
+    <div class="title">0.1.0 <span class="badge stable">Estable</span></div>
+    <div class="sub">main · 0.1.0 (5) · 13/10/2026 21:14 UTC</div>
+  </a>
+  <a class="button small" href="itms-services://?action=download-manifest&amp;url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Github-Repository-Manager-by-Leonera%2F0.1.0%2Fmanifest.plist">Instalar</a>
+</div>
+<div class="row">
+  <a class="grow" href="build-4-310ef21/" style="color:inherit;text-decoration:none">
+    <div class="title">build-4-310ef21 </div>
+    <div class="sub">claude/ios-github-repo-manager-kcx0q5 · 0.1.0 (4) · 13/10/2026 21:13 UTC</div>
+  </a>
+  <a class="button small" href="itms-services://?action=download-manifest&amp;url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Github-Repository-Manager-by-Leonera%2Fbuild-4-310ef21%2Fmanifest.plist">Instalar</a>
+</div>
+<div class="row">
+  <a class="grow" href="build-3-0ff8730/" style="color:inherit;text-decoration:none">
+    <div class="title">build-3-0ff8730 </div>
+    <div class="sub">claude/ios-github-repo-manager-kcx0q5 · 0.1.0 (3) · 13/10/2026 20:54 UTC</div>
+  </a>
+  <a class="button small" href="itms-services://?action=download-manifest&amp;url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Github-Repository-Manager-by-Leonera%2Fbuild-3-0ff8730%2Fmanifest.plist">Instalar</a>
+</div>
+<div class="row">
+  <a class="grow" href="build-2-8e59149/" style="color:inherit;text-decoration:none">
+    <div class="title">build-2-8e59149 </div>
+    <div class="sub">claude/ios-github-repo-manager-kcx0q5 · 0.1.0 (2) · 13/10/2026 20:43 UTC</div>
+  </a>
+  <a class="button small" href="itms-services://?action=download-manifest&amp;url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Github-Repository-Manager-by-Leonera%2Fbuild-2-8e59149%2Fmanifest.plist">Instalar</a>
+</div>
+<div class="row">
+  <a class="grow" href="build-1-c4a6f9e/" style="color:inherit;text-decoration:none">
+    <div class="title">build-1-c4a6f9e </div>
+    <div class="sub">claude/ios-github-repo-manager-kcx0q5 · 0.1.0 (1) · 13/10/2026 20:15 UTC</div>
+  </a>
+  <a class="button small" href="itms-services://?action=download-manifest&amp;url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Github-Repository-Manager-by-Leonera%2Fbuild-1-c4a6f9e%2Fmanifest.plist">Instalar</a>
+</div></div>
+
+<h2>Si no se instala</h2>
+<p class="notes">Abre esta página en <b>Safari</b> en el iPhone. Si aparece «No se puede instalar la app»,
+el UDID del dispositivo no está registrado en el portal de Apple Developer: regístralo y haz un push para
+generar un build nuevo. En iOS 16 o posterior activa <b>Ajustes › Privacidad y seguridad › Modo de
+desarrollador</b> para poder abrir la app.</p>
+
+<footer>Se conservan todas las versiones de <code>main</code> y los últimos 50 builds de otras ramas.</footer>
+
+</main></body>
+</html>

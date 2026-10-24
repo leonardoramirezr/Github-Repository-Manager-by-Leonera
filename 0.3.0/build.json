@@ -1,0 +1,18 @@
+{
+  "tag": "0.3.0",
+  "app_name": "Repository Manager",
+  "version": "0.3.0",
+  "build": "12",
+  "bundle_id": "com.leonardoramirezr.repo-manager-by-leonera",
+  "stable": true,
+  "branch": "main",
+  "commit": "eaff2222fa2e5f220395aa2b22a3495406b2f013",
+  "date": "2026-10-13T23:41:47Z",
+  "run_url": "https://github.com/leonardoramirezr/iOS-Repo-Manager-by-Leonera/actions/runs/38485606105",
+  "devices": 1,
+  "ipa": "Repo Manager by Leonera.ipa",
+  "ipa_size": 385936,
+  "page_url": "https://leonardoramirezr.github.io/iOS-Repo-Manager-by-Leonera/0.3.0/",
+  "manifest_url": "https://leonardoramirezr.github.io/iOS-Repo-Manager-by-Leonera/0.3.0/manifest.plist",
+  "install_url": "itms-services://?action=download-manifest&url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Repo-Manager-by-Leonera%2F0.3.0%2Fmanifest.plist"
+}

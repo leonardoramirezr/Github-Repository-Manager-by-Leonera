@@ -1,0 +1,18 @@
+{
+  "tag": "build-8-3cd88af",
+  "app_name": "Repository Manager",
+  "version": "0.3.0",
+  "build": "8",
+  "bundle_id": "com.leonardoramirezr.repo-manager-by-leonera",
+  "stable": false,
+  "branch": "claude/gracious-volta-yq762l",
+  "commit": "3cd88af58c5adf9795988e6da0adf17885fc84f2",
+  "date": "2026-10-13T23:07:08Z",
+  "run_url": "https://github.com/leonardoramirezr/iOS-Repo-Manager-by-Leonera/actions/runs/38482013368",
+  "devices": 1,
+  "ipa": "Repo Manager by Leonera.ipa",
+  "ipa_size": 313076,
+  "page_url": "https://leonardoramirezr.github.io/iOS-Repo-Manager-by-Leonera/build-8-3cd88af/",
+  "manifest_url": "https://leonardoramirezr.github.io/iOS-Repo-Manager-by-Leonera/build-8-3cd88af/manifest.plist",
+  "install_url": "itms-services://?action=download-manifest&url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Repo-Manager-by-Leonera%2Fbuild-8-3cd88af%2Fmanifest.plist"
+}

@@ -1,0 +1,18 @@
+{
+  "tag": "build-1-c4a6f9e",
+  "app_name": "Repository Manager",
+  "version": "0.1.0",
+  "build": "1",
+  "bundle_id": "com.leonardoramirezr.ios-github-repository-manager-by-leonera",
+  "stable": false,
+  "branch": "claude/ios-github-repo-manager-kcx0q5",
+  "commit": "c4a6f9e2e6e070afa9aa4b564db0e3ec1cdfc9ad",
+  "date": "2026-10-13T20:15:37Z",
+  "run_url": "https://github.com/leonardoramirezr/iOS-Github-Repository-Manager-by-Leonera/actions/runs/38461184777",
+  "devices": 1,
+  "ipa": "RepositoryManager.ipa",
+  "ipa_size": 313045,
+  "page_url": "https://leonardoramirezr.github.io/iOS-Github-Repository-Manager-by-Leonera/build-1-c4a6f9e/",
+  "manifest_url": "https://leonardoramirezr.github.io/iOS-Github-Repository-Manager-by-Leonera/build-1-c4a6f9e/manifest.plist",
+  "install_url": "itms-services://?action=download-manifest&url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Github-Repository-Manager-by-Leonera%2Fbuild-1-c4a6f9e%2Fmanifest.plist"
+}
