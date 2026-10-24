@@ -60,6 +60,7 @@ struct RepositoryDetails: Decodable {
     let allowMergeCommit: Bool?
     let allowSquashMerge: Bool?
     let allowRebaseMerge: Bool?
+    let deleteBranchOnMerge: Bool?
     let pullRequestCreationPolicy: String?
 
     enum CodingKeys: String, CodingKey {
@@ -68,6 +69,7 @@ struct RepositoryDetails: Decodable {
         case allowMergeCommit = "allow_merge_commit"
         case allowSquashMerge = "allow_squash_merge"
         case allowRebaseMerge = "allow_rebase_merge"
+        case deleteBranchOnMerge = "delete_branch_on_merge"
         case pullRequestCreationPolicy = "pull_request_creation_policy"
     }
 
@@ -80,7 +82,8 @@ struct RepositoryDetails: Decodable {
             pullRequestCreationPolicy: pullRequestCreationPolicy.flatMap(PullRequestCreationPolicy.init(rawValue:)),
             allowMergeCommit: allowMergeCommit ?? true,
             allowSquashMerge: allowSquashMerge ?? true,
-            allowRebaseMerge: allowRebaseMerge ?? true
+            allowRebaseMerge: allowRebaseMerge ?? true,
+            deleteBranchOnMerge: deleteBranchOnMerge
         )
     }
 }
@@ -303,6 +306,9 @@ struct GitHubClient {
         if new.allowMergeCommit != old.allowMergeCommit { body["allow_merge_commit"] = new.allowMergeCommit }
         if new.allowSquashMerge != old.allowSquashMerge { body["allow_squash_merge"] = new.allowSquashMerge }
         if new.allowRebaseMerge != old.allowRebaseMerge { body["allow_rebase_merge"] = new.allowRebaseMerge }
+        if new.deleteBranchOnMerge != old.deleteBranchOnMerge, let delete = new.deleteBranchOnMerge {
+            body["delete_branch_on_merge"] = delete
+        }
         guard !body.isEmpty else { return }
         _ = try await request("PATCH", url(repoSegments(repository)), body: body)
     }
@@ -316,6 +322,9 @@ struct GitHubClient {
         ]
         if let policy = settings.pullRequestCreationPolicy {
             body["pull_request_creation_policy"] = policy.rawValue
+        }
+        if let delete = settings.deleteBranchOnMerge {
+            body["delete_branch_on_merge"] = delete
         }
         _ = try await request("PATCH", url(repoSegments(repository)), body: body)
     }
