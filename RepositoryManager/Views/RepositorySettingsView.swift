@@ -237,6 +237,12 @@ struct RepositorySettingsView: View {
                 }
             }
             .disabled(!details.reportsMergeSettings)
+            if edited.deleteBranchOnMerge != nil {
+                Toggle(isOn: deleteBranchOnMerge) {
+                    Label("Eliminar la rama al hacer merge", systemImage: "trash")
+                }
+                .disabled(!details.reportsMergeSettings)
+            }
         } header: {
             Text("Pull requests")
         } footer: {
@@ -307,6 +313,12 @@ struct RepositorySettingsView: View {
                 Text("El sitio se publica desde la rama y carpeta indicadas. Si la rama no existe, se crea desde el último commit de main.")
             }
         }
+    }
+
+    // MARK: - Pull request bindings
+
+    private var deleteBranchOnMerge: Binding<Bool> {
+        Binding(get: { edited.deleteBranchOnMerge ?? false }, set: { edited.deleteBranchOnMerge = $0 })
     }
 
     // MARK: - Pages bindings

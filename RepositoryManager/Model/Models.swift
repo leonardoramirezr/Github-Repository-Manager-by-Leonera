@@ -312,6 +312,9 @@ struct RepositorySettings: Codable, Equatable, Hashable {
     var allowMergeCommit = true
     var allowSquashMerge = true
     var allowRebaseMerge = true
+    /// Delete the head branch of a pull request once it is merged. nil leaves it unchanged: presets saved
+    /// before this option existed, and repositories where GitHub does not report it.
+    var deleteBranchOnMerge: Bool?
 
     var hasMergeMethod: Bool { allowMergeCommit || allowSquashMerge || allowRebaseMerge }
 }

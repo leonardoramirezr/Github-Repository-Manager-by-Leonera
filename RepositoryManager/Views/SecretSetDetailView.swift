@@ -189,6 +189,13 @@ struct SecretSetDetailView: View {
                 Toggle(isOn: repositorySetting(\.allowRebaseMerge, default: true)) {
                     Label("Permitir rebase merging", systemImage: "arrow.triangle.branch")
                 }
+                Picker(selection: repositorySetting(\.deleteBranchOnMerge, default: nil)) {
+                    Text("No cambiar").tag(Bool?.none)
+                    Text("Activar").tag(Optional(true))
+                    Text("Desactivar").tag(Optional(false))
+                } label: {
+                    Label("Eliminar la rama al hacer merge", systemImage: "trash")
+                }
             }
         } header: {
             Text("Pull requests")
